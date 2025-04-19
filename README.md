@@ -60,7 +60,7 @@ OPTION
 
 ### icon
 
-<img width="200" src="docs/image/image.png", alt="DrawlScan Icon">
+<img width="200" src="<https://github.com/nagayon-935/DrawlScan/blob/main/docs/image/image.png>", alt="DrawlScan Icon">
 
 ### The project name(**DrawlScan**) comes from?
 
