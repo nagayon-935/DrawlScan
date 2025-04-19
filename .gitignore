@@ -23,3 +23,15 @@ go.work.sum
 
 # env file
 .env
+
+#DS_Store
+.DS_Store
+
+#VS Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-workspace
+.devcontainer/*
