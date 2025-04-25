@@ -3,7 +3,7 @@ package main
 import "testing"
 
 func Example_wildcherry() {
-	goMain([]string{"drawlscan"})
+	goMain([]string{"DrawlScan"})
 	// Output:
 	// Welcome to WildCherry!
 }
