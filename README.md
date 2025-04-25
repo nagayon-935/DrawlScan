@@ -2,8 +2,10 @@
 
 Observe your network traffic in real-time, rendered as ASCII art.
 
-![Go Version1.23](https://img.shields.io/badge/go-v1.22-blue "Go Version1.23")
+![Go Version1.23](https://img.shields.io/badge/go-v1.23-blue "Go Version1.23")
 ![MIT License](https://img.shields.io/badge/license-MIT-blue "MIT License")
+[![Go Report Card](https://goreportcard.com/badge/github.com/nagayon-935/DrawlScan)](https://goreportcard.com/report/github.com/nagayon-935/DrawlScan)
+[![Coverage Status](https://coveralls.io/repos/github/nagayon-935/DrawlScan/badge.svg?branch=main)](https://coveralls.io/github/nagayon-935/DrawlScan?branch=main)
 
 ## Overview
 
