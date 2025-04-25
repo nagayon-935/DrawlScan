@@ -23,6 +23,10 @@ jobs:
       with:
         just-version: '1.40.0'
 
+    - name: Install libpcap-dev (Linux)
+      if: "matrix.os == 'ubuntu-latest'"
+      run: sudo apt-get update && sudo apt-get install -y libpcap-dev
+
     - name: checkout
       uses: actions/checkout@v4
 
