@@ -5,7 +5,7 @@ import "testing"
 func Example_wildcherry() {
 	goMain([]string{"DrawlScan"})
 	// Output:
-	// Welcome to WildCherry!
+	// Welcome to DrawlScan!
 }
 
 func TestHello(t *testing.T) {
