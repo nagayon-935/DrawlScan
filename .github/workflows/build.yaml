@@ -17,14 +17,14 @@ jobs:
     - name: setup go
       uses: actions/setup-go@v2
       with:
-        go-version: 1.16
+        go-version: 1.23.8
 
     - uses: extractions/setup-just@v3
       with:
         just-version: '1.40.0’
 
     - name: checkout
-      uses: actions/checkout@v1
+      uses: actions/checkout@v3
 
     - name: build
       run: just build test
