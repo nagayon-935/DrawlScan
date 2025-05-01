@@ -30,34 +30,25 @@ jobs:
 
     - name: Install Npcap SDK (Windows)
       if: matrix.os == 'windows-latest'
+      shell: pwsh
       run: |
         $sdkUrl = "https://npcap.com/dist/npcap-sdk-1.15.zip"
         $sdkZip = "$env:USERPROFILE\npcap-sdk.zip"
         $destDir = "$env:USERPROFILE\npcap-sdk"
+        $wpdpackDir = "C:\wpdpack"
 
         Invoke-WebRequest -Uri $sdkUrl -OutFile $sdkZip
-        Expand-Archive -Path $sdkZip -DestinationPath $destDir
+        Expand-Archive -Path $sdkZip -DestinationPath $destDir -Force
 
-        Write-Host "Listing contents of ${destDir}:"
-        Get-ChildItem -Path $destDir -Recurse
+        Write-Host "Npcap SDK extracted to: $destDir"
+        Get-ChildItem -Path $destDir
 
-        # まず展開直後のディレクトリをすべて取得
-        $dirs = Get-ChildItem -Path $destDir -Directory
-
-        foreach ($dir in $dirs) {
-         if (Test-Path "$($dir.FullName)\Lib") {
-           Rename-Item -Path $dir.FullName -NewName "$destDir\wpdpack"
-            break
-          }
+        if (Test-Path $wpdpackDir) {
+          Remove-Item -Path $wpdpackDir -Recurse -Force
         }
+        Copy-Item -Path $destDir -Destination $wpdpackDir -Recurse
 
-        if (!(Test-Path "$destDir\wpdpack")) {
-          Write-Error "Failed to locate and rename npcap sdk directory"
-          exit 1
-        }
-
-        Write-Host "Npcap SDK renamed to: $destDir\wpdpack"
-        shell: powershell
+        Write-Host "Npcap SDK copied to: $wpdpackDir"
 
     - name: Set CGO flags for Npcap (Windows)
       if: "matrix.os == 'windows-latest'"
