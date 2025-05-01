@@ -67,7 +67,7 @@ jobs:
 
     - name: Convert coverage format to lcov
       if: "matrix.os == 'ubuntu-latest'"
-      uses: jandelgado/gcov2lcov-action@v1.0.0
+      uses: jandelgado/gcov2lcov-action@v1.1.1
       with:
         infile: coverage.out
         outfile: coverage.lcov
