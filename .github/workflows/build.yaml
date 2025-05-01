@@ -28,27 +28,36 @@ jobs:
       if: "matrix.os == 'ubuntu-latest'"
       run: sudo apt-get update && sudo apt-get install -y libpcap-dev
 
-    - name: Install Npcap SDK (Windows)
-      if: "matrix.os == 'windows-latest'"
-      run: |
-        $sdkUrl = "https://npcap.com/dist/npcap-sdk-1.15.zip"
-        $sdkZip = "$env:USERPROFILE\npcap-sdk.zip"
-        $destDir = "$env:USERPROFILE\npcap-sdk"
+- name: Install Npcap SDK (Windows)
+  if: "matrix.os == 'windows-latest'"
+  run: |
+    $sdkUrl = "https://npcap.com/dist/npcap-sdk-1.15.zip"
+    $sdkZip = "$env:USERPROFILE\npcap-sdk.zip"
+    $destDir = "$env:USERPROFILE\npcap-sdk"
 
-        Invoke-WebRequest -Uri $sdkUrl -OutFile $sdkZip
-        Expand-Archive -Path $sdkZip -DestinationPath $destDir
+    Invoke-WebRequest -Uri $sdkUrl -OutFile $sdkZip
+    Expand-Archive -Path $sdkZip -DestinationPath $destDir
 
-        $extracted = Get-ChildItem -Path $destDir -Directory | Where-Object { $_.Name -like "npcap-sdk*" } | Select-Object -First 1
+    Write-Host "Listing contents of $destDir:"
+    Get-ChildItem -Path $destDir -Recurse
 
-        if ($extracted -eq $null) {
-          Write-Error "Npcap SDK directory not found after extraction"
-          exit 1
-        }
+    # まず展開直後のディレクトリをすべて取得
+    $dirs = Get-ChildItem -Path $destDir -Directory
 
-        Rename-Item -Path $extracted.FullName -NewName "wpdpack"
+    foreach ($dir in $dirs) {
+      if (Test-Path "$($dir.FullName)\Lib") {
+        Rename-Item -Path $dir.FullName -NewName "$destDir\wpdpack"
+        break
+      }
+    }
 
-        Get-ChildItem -Path $destDir
-      shell: powershell
+    if (!(Test-Path "$destDir\wpdpack")) {
+      Write-Error "Failed to locate and rename npcap sdk directory"
+      exit 1
+    }
+
+    Write-Host "Npcap SDK renamed to: $destDir\wpdpack"
+  shell: powershell
 
     - name: Set CGO flags for Npcap (Windows)
       if: "matrix.os == 'windows-latest'"
