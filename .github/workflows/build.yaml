@@ -28,36 +28,36 @@ jobs:
       if: "matrix.os == 'ubuntu-latest'"
       run: sudo apt-get update && sudo apt-get install -y libpcap-dev
 
-- name: Install Npcap SDK (Windows)
-  if: "matrix.os == 'windows-latest'"
-  run: |
-    $sdkUrl = "https://npcap.com/dist/npcap-sdk-1.15.zip"
-    $sdkZip = "$env:USERPROFILE\npcap-sdk.zip"
-    $destDir = "$env:USERPROFILE\npcap-sdk"
+    - name: Install Npcap SDK (Windows)
+      if: matrix.os == 'windows-latest'
+     run: |
+        $sdkUrl = "https://npcap.com/dist/npcap-sdk-1.15.zip"
+        $sdkZip = "$env:USERPROFILE\npcap-sdk.zip"
+        $destDir = "$env:USERPROFILE\npcap-sdk"
 
-    Invoke-WebRequest -Uri $sdkUrl -OutFile $sdkZip
-    Expand-Archive -Path $sdkZip -DestinationPath $destDir
+        Invoke-WebRequest -Uri $sdkUrl -OutFile $sdkZip
+        Expand-Archive -Path $sdkZip -DestinationPath $destDir
 
-    Write-Host "Listing contents of $destDir:"
-    Get-ChildItem -Path $destDir -Recurse
+        Write-Host "Listing contents of $destDir:"
+        Get-ChildItem -Path $destDir -Recurse
 
-    # まず展開直後のディレクトリをすべて取得
-    $dirs = Get-ChildItem -Path $destDir -Directory
+        # まず展開直後のディレクトリをすべて取得
+        $dirs = Get-ChildItem -Path $destDir -Directory
 
-    foreach ($dir in $dirs) {
-      if (Test-Path "$($dir.FullName)\Lib") {
-        Rename-Item -Path $dir.FullName -NewName "$destDir\wpdpack"
-        break
-      }
-    }
+        foreach ($dir in $dirs) {
+         if (Test-Path "$($dir.FullName)\Lib") {
+           Rename-Item -Path $dir.FullName -NewName "$destDir\wpdpack"
+            break
+          }
+        }
 
-    if (!(Test-Path "$destDir\wpdpack")) {
-      Write-Error "Failed to locate and rename npcap sdk directory"
-      exit 1
-    }
+        if (!(Test-Path "$destDir\wpdpack")) {
+          Write-Error "Failed to locate and rename npcap sdk directory"
+          exit 1
+        }
 
-    Write-Host "Npcap SDK renamed to: $destDir\wpdpack"
-  shell: powershell
+        Write-Host "Npcap SDK renamed to: $destDir\wpdpack"
+        shell: powershell
 
     - name: Set CGO flags for Npcap (Windows)
       if: "matrix.os == 'windows-latest'"
