@@ -31,10 +31,23 @@ jobs:
     - name: Install Npcap SDK (Windows)
       if: "matrix.os == 'windows-latest'"
       run: |
-        Invoke-WebRequest -Uri "https://npcap.com/dist/npcap-sdk-1.15.zip" -OutFile "npcap-sdk.zip"
-        Expand-Archive -Path "npcap-sdk.zip" -DestinationPath "C:\"
-        $dir = Get-ChildItem -Path "C:\" -Directory | Where-Object { $_.Name -like "npcap-sdk*" } | Select-Object -First 1
-        Rename-Item -Path $dir.FullName -NewName "wpdpack"
+        $sdkUrl = "https://npcap.com/dist/npcap-sdk-1.15.zip"
+        $sdkZip = "$env:USERPROFILE\npcap-sdk.zip"
+        $destDir = "$env:USERPROFILE\npcap-sdk"
+
+        Invoke-WebRequest -Uri $sdkUrl -OutFile $sdkZip
+        Expand-Archive -Path $sdkZip -DestinationPath $destDir
+
+        $extracted = Get-ChildItem -Path $destDir -Directory | Where-Object { $_.Name -like "npcap-sdk*" } | Select-Object -First 1
+
+        if ($extracted -eq $null) {
+          Write-Error "Npcap SDK directory not found after extraction"
+          exit 1
+        }
+
+        Rename-Item -Path $extracted.FullName -NewName "wpdpack"
+
+        Get-ChildItem -Path $destDir
       shell: powershell
 
     - name: Set CGO flags for Npcap (Windows)
