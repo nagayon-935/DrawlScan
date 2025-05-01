@@ -33,7 +33,8 @@ jobs:
       run: |
         Invoke-WebRequest -Uri "https://npcap.com/dist/npcap-sdk-1.15.zip" -OutFile "npcap-sdk.zip"
         Expand-Archive -Path "npcap-sdk.zip" -DestinationPath "C:\"
-        Rename-Item -Path "C:\npcap-sdk-1.15" -NewName "wpdpack"
+        $dir = Get-ChildItem -Path "C:\" -Directory | Where-Object { $_.Name -like "npcap-sdk*" } | Select-Object -First 1
+        Rename-Item -Path $dir.FullName -NewName "wpdpack"
       shell: powershell
 
     - name: Set CGO flags for Npcap (Windows)
