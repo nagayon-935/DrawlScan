@@ -38,7 +38,7 @@ jobs:
         Invoke-WebRequest -Uri $sdkUrl -OutFile $sdkZip
         Expand-Archive -Path $sdkZip -DestinationPath $destDir
 
-        Write-Host "Listing contents of $destDir:"
+        Write-Host "Listing contents of ${destDir}:"
         Get-ChildItem -Path $destDir -Recurse
 
         # まず展開直後のディレクトリをすべて取得
