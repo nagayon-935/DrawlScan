@@ -1,3 +1,4 @@
+# show help message
 @default: help
 
 App := 'DrawlScan'
@@ -10,8 +11,37 @@ Version := `grep '^const VERSION = ' cmd/main/version.go | sed "s/^VERSION = \"\
     echo ""
     just --list
 
+# bulid the applicaion with running tests
 build: test
     go build -o drawlscan cmd/main/drawlscan.go
 
+# run tests and generate the coverage report
 test:
     go test -covermode=count -coverprofile=coverage.out ./...
+
+# clean up build artifacts
+clean:
+    go clean
+    rm -f coverage.out wildcherry build
+
+# update the version if the new version is provided
+update_version new_version = "":
+    if [ "{{ new_version }}" != "" ]; then \
+        sed 's/$VERSION/{{ new_version }}/g' .template/README.md > README.md; \
+        sed 's/$VERSION/{{ new_version }}/g' .template/version.go > cmd/main/version.go; \
+    fi
+
+# build DrawlScan for all platforms
+make_distribution_files:
+    for os in "linux" "windows" "darwin"; do \
+        for arch in "amd64" "arm64"; do \
+            mkdir -p dist/{{ APP }}-$os-$arch; \
+            env GOOS=$os GOARCH=$arch go build -o cmd/main/wildcherry.go; \
+            cp README.md LICENSE dist/{{ App }}-$os-$arch; \
+            tar cvfz dist/{{ App }}-$os-$arch.tar.gz -C dist {{ App }}-$os-$arch; \
+        done; \
+    done
+
+# upload assets to the GitHub release page
+upload_assets tag:
+    gh release upload --repo nagayon-935/{{ APP }} {{ tag }} dist/*.tar.gz
