@@ -22,7 +22,7 @@ test:
 # clean up build artifacts
 clean:
     go clean
-    rm -f coverage.out wildcherry build
+    rm -f coverage.out drawlscan build
 
 # update the version if the new version is provided
 update_version new_version = "":
@@ -35,8 +35,8 @@ update_version new_version = "":
 make_distribution_files:
     for os in "linux" "windows" "darwin"; do \
         for arch in "amd64" "arm64"; do \
-            mkdir -p dist/{{ APP }}-$os-$arch; \
-            env GOOS=$os GOARCH=$arch go build -o cmd/main/wildcherry.go; \
+            mkdir -p dist/{{ App }}-$os-$arch; \
+            env GOOS=$os GOARCH=$arch go build -o cmd/main/drawlscan.go; \
             cp README.md LICENSE dist/{{ App }}-$os-$arch; \
             tar cvfz dist/{{ App }}-$os-$arch.tar.gz -C dist {{ App }}-$os-$arch; \
         done; \
@@ -44,4 +44,4 @@ make_distribution_files:
 
 # upload assets to the GitHub release page
 upload_assets tag:
-    gh release upload --repo nagayon-935/{{ APP }} {{ tag }} dist/*.tar.gz
+    gh release upload --repo nagayon-935/{{ App }} {{ tag }} dist/*.tar.gz
