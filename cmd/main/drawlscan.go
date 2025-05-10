@@ -7,10 +7,12 @@ import (
 )
 
 type analysisOption struct {
-	detail  bool
-	geoip   bool
-	rdns    bool
-	summary bool
+	detail   bool
+	geoip    bool
+	rdns     bool
+	summary  bool
+	protocol string
+	port     string
 }
 
 type captureOption struct {
@@ -46,17 +48,19 @@ func helpMessage() string {
 
 OPTIONS:
     -c, --count <NUM>              Capture only a specified number of packets
-    -t, --timeout <TIME>           Stop capturing after a specified number of seconds
     -d, --detail                   Show detailed packet information, including header fields and metadata
     -g, --geoip                    Show GeoIP information for source and destination IP addresses
-    -r, --rdns                     Perform reverse DNS lookups on source and destination IP addresses
-    -s, --summary                  Display a summary of captured packets by protocol, source, etc
+    -h, --help                     Display this help message
     -i, --interface <INTERFACE>    Specify the network interface to capture packets from (e.g., eth0, wlan0)
     -o, --output <FILE>            Save the captured packets to a file in PCAP format
+	-p, --protocol <PROTOCOL>        Filter packets by protocol (e.g., TCP, UDP, ICMP)
+	-P, --port <PORT>              Filter packets by port number (e.g., 80, 443)
+    -s, --summary                  Display a summary of captured packets by protocol, source, etc
+    -r, --rdns                     Perform reverse DNS lookups on source and destination IP addresses
+    -t, --timeout <TIME>           Stop capturing after a specified number of seconds
+    -v, --version                  Show version information
     --ascii                        Enable ASCII-art visualization of packets and traffic (Default is enabled)
     --no-ascii                     Disable ASCII-art output
-    -h, --help                     Display this help message
-    -v, --version                  Show version information
 `
 }
 
@@ -72,19 +76,17 @@ func buildFlagSet() (*flag.FlagSet, *options) {
 	flags := flag.NewFlagSet("drawlscan", flag.ContinueOnError)
 	flags.Usage = func() { fmt.Println(helpMessage()) }
 
-	// Capture options
-	flags.IntVar(&opts.capture.count, "c", 0, "Capture only a specified number of packets")
-	flags.IntVar(&opts.capture.timeout, "t", 0, "Stop capturing after a specified number of seconds")
-
 	// Analysis options
 	flags.BoolVar(&opts.analysis.detail, "d", false, "Show detailed packet information, including header fields and metadata")
 	flags.BoolVar(&opts.analysis.geoip, "g", false, "Show GeoIP information for source and destination IP addresses")
 	flags.BoolVar(&opts.analysis.rdns, "r", false, "Perform reverse DNS lookups on source and destination IP addresses")
 	flags.BoolVar(&opts.analysis.summary, "s", false, "Display a summary of captured packets by protocol, source, etc")
+	flags.StringVar(&opts.analysis.protocol, "p", "", "Filter packets by protocol (e.g., TCP, UDP, ICMP)")
+	flags.StringVar(&opts.analysis.port, "P", "", "Filter packets by port number (e.g., 80, 443)")
 
-	// Visualization options
-	flags.BoolVar(&opts.visualization.ascii, "ascii", true, "Enable ASCII-art visualization of packets and traffic (Default is enable)")
-	flags.BoolVar(&opts.visualization.noAscii, "no-ascii", false, "Disable ASCII-art output")
+	// Capture options
+	flags.IntVar(&opts.capture.count, "c", 0, "Capture only a specified number of packets")
+	flags.IntVar(&opts.capture.timeout, "t", 0, "Stop capturing after a specified number of seconds")
 
 	// General options
 	flags.BoolVar(&opts.general.help, "h", false, "Help message")
@@ -93,6 +95,10 @@ func buildFlagSet() (*flag.FlagSet, *options) {
 	// IO options
 	flags.StringVar(&opts.io.interfaceName, "i", "", "Specify the network interface to capture packets from (e.g., eth0, wlan0)")
 	flags.StringVar(&opts.io.outputFile, "o", "", "Save the captured packets to a file in PCAP format")
+
+	// Visualization options
+	flags.BoolVar(&opts.visualization.ascii, "ascii", true, "Enable ASCII-art visualization of packets and traffic (Default is enable)")
+	flags.BoolVar(&opts.visualization.noAscii, "no-ascii", false, "Disable ASCII-art output")
 
 	return flags, opts
 }
