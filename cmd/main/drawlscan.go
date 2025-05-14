@@ -1,9 +1,10 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
+
+	flag "github.com/spf13/pflag"
 )
 
 type analysisOption struct {
@@ -77,24 +78,24 @@ func buildFlagSet() (*flag.FlagSet, *options) {
 	flags.Usage = func() { fmt.Println(helpMessage()) }
 
 	// Analysis options
-	flags.BoolVar(&opts.analysis.detail, "d", false, "Show detailed packet information, including header fields and metadata")
-	flags.BoolVar(&opts.analysis.geoip, "g", false, "Show GeoIP information for source and destination IP addresses")
-	flags.BoolVar(&opts.analysis.rdns, "r", false, "Perform reverse DNS lookups on source and destination IP addresses")
-	flags.BoolVar(&opts.analysis.summary, "s", false, "Display a summary of captured packets by protocol, source, etc")
-	flags.StringVar(&opts.analysis.protocol, "p", "", "Filter packets by protocol (e.g., TCP, UDP, ICMP)")
-	flags.StringVar(&opts.analysis.port, "P", "", "Filter packets by port number (e.g., 80, 443)")
+	flags.BoolVarP(&opts.analysis.detail, "detail", "d", false, "Show detailed packet information, including header fields and metadata")
+	flags.BoolVarP(&opts.analysis.geoip, "geoip", "g", false, "Show GeoIP information for source and destination IP addresses")
+	flags.BoolVarP(&opts.analysis.rdns, "rdns", "r", false, "Perform reverse DNS lookups on source and destination IP addresses")
+	flags.BoolVarP(&opts.analysis.summary, "summary", "s", false, "Display a summary of captured packets by protocol, source, etc")
+	flags.StringVarP(&opts.analysis.protocol, "protocol", "p", "", "Filter packets by protocol (e.g., TCP, UDP, ICMP)")
+	flags.StringVarP(&opts.analysis.port, "port", "P", "", "Filter packets by port number (e.g., 80, 443)")
 
 	// Capture options
-	flags.IntVar(&opts.capture.count, "c", 0, "Capture only a specified number of packets")
-	flags.IntVar(&opts.capture.timeout, "t", 0, "Stop capturing after a specified number of seconds")
+	flags.IntVarP(&opts.capture.count, "count", "c", 0, "Capture only a specified number of packets")
+	flags.IntVarP(&opts.capture.timeout, "timeout", "t", 0, "Stop capturing after a specified number of seconds")
 
 	// General options
-	flags.BoolVar(&opts.general.help, "h", false, "Help message")
-	flags.BoolVar(&opts.general.version, "v", false, "Version information")
+	flags.BoolVarP(&opts.general.help, "help", "h", false, "Help message")
+	flags.BoolVarP(&opts.general.version, "version", "v", false, "Version information")
 
 	// IO options
-	flags.StringVar(&opts.io.interfaceName, "i", "", "Specify the network interface to capture packets from (e.g., eth0, wlan0)")
-	flags.StringVar(&opts.io.outputFile, "o", "", "Save the captured packets to a file in PCAP format")
+	flags.StringVarP(&opts.io.interfaceName, "interface", "i", "", "Specify the network interface to capture packets from (e.g., eth0, wlan0)")
+	flags.StringVarP(&opts.io.outputFile, "output", "o", "", " Save the captured packets to a file in PCAP format")
 
 	// Visualization options
 	flags.BoolVar(&opts.visualization.ascii, "ascii", true, "Enable ASCII-art visualization of packets and traffic (Default is enable)")
@@ -109,6 +110,9 @@ func hello() string {
 
 func goMain(args []string) int {
 	fmt.Println(hello())
+	flags, opts := buildFlagSet()
+	flags.Parse(args[1:])
+	fmt.Println("Parsed options:", opts.io.interfaceName)
 	return 0
 }
 
