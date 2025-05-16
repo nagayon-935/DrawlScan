@@ -2,7 +2,7 @@ package main
 
 import "testing"
 
-func Example_wildcherry() {
+func Example_drawlscan() {
 	goMain([]string{"DrawlScan"})
 	// Output:
 	// Welcome to DrawlScan!
