@@ -2,9 +2,23 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"net"
 	"os"
+	"sort"
+	"strings"
 
+	"github.com/google/gopacket"
+	"github.com/google/gopacket/pcap"
+	"github.com/nagayon-935/DrawlScan/cmd/handler"
+	"github.com/nagayon-935/DrawlScan/cmd/utils"
 	flag "github.com/spf13/pflag"
+)
+
+const (
+	snapshotLen = 1024
+	promiscuous = true
+	timeout     = pcap.BlockForever
 )
 
 type analysisOption struct {
@@ -108,11 +122,86 @@ func hello() string {
 	return "Welcome to DrawlScan!"
 }
 
+func autoSelectInterface() string {
+	ifs, err := net.Interfaces()
+	if err != nil {
+		log.Fatal("Failed to get interfaces:", err)
+	}
+
+	// インターフェイスをインデックスの昇順でソート
+	sort.Slice(ifs, func(i, j int) bool {
+		return ifs[i].Index < ifs[j].Index
+	})
+
+	for _, iface := range ifs {
+
+		// インターフェイスが有効で、ループバックやトンネルでないものを選択
+		if (iface.Flags&net.FlagUp != 0) && (iface.Flags&net.FlagLoopback == 0) && !strings.HasPrefix(iface.Name, "utun") {
+			// 接続状態を確認
+			if isInterfaceConnected(iface.Name) {
+				return iface.Name
+			}
+		}
+	}
+
+	// 適切なインターフェイスが見つからない場合
+	fmt.Println("No suitable interface found.")
+	return ""
+}
+
+func isInterfaceConnected(ifaceName string) bool {
+	// pcap.FindAllDevs を使用して、利用可能なインターフェイスを取得
+	devices, err := pcap.FindAllDevs()
+	if err != nil {
+		return false
+	}
+
+	// 指定されたインターフェイスがデバイスリストに含まれているか確認
+	for _, dev := range devices {
+		if dev.Name == ifaceName {
+			// アドレスが存在する場合、接続されているとみなす
+			if len(dev.Addresses) > 0 {
+				return true
+			}
+			return false
+		}
+	}
+
+	return false
+}
+
 func goMain(args []string) int {
-	fmt.Println(hello())
-	flags, opts := buildFlagSet()
-	flags.Parse(args[1:])
-	fmt.Println("Parsed options:", opts.io.interfaceName)
+	var iface string
+	flag.StringVar(&iface, "i", "", "network interface to capture packets from")
+	flag.Parse()
+
+	if iface == "" {
+		iface = autoSelectInterface()
+		if iface == "" {
+			log.Fatal("No suitable interface found")
+		}
+		fmt.Printf("Using interface: %s\n", iface)
+	}
+
+	handle, err := pcap.OpenLive(iface, snapshotLen, promiscuous, timeout)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer handle.Close()
+
+	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
+	for packet := range packetSource.Packets() {
+		var blocks []string
+		for _, h := range handler.Handlers {
+			if packet.Layer(h.LayerType) != nil {
+				blocks = append(blocks, h.Handler(packet))
+			}
+		}
+		utils.PrintHorizontalBlocks(blocks)
+	}
+	// flags, opts := buildFlagSet()
+	// flags.Parse(args[1:])
+	//fmt.Println("Parsed options:", opts.io.interfaceName)
 	return 0
 }
 
