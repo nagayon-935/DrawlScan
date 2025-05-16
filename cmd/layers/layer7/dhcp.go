@@ -1,9 +1,19 @@
 package layer7
 
-if dhcpLayer := packet.Layer(layers.LayerTypeDHCPv4); dhcpLayer != nil {
-	dhcp := dhcpLayer.(*layers.DHCPv4)
+import (
+	"fmt"
+	"net"
+	"strings"
 
-	// 必要なオプションを直接検索
+	"github.com/fatih/color"
+	"github.com/google/gopacket"
+	"github.com/google/gopacket/layers"
+	"github.com/nagayon-935/DrawlScan/cmd/utils"
+)
+
+func PrintDhcpLayer(packet gopacket.Packet) string {
+	dhcp := packet.Layer(layers.LayerTypeDHCPv4).(*layers.DHCPv4)
+
 	var subnetMask, router, domainName, leaseTime, serverIdentifier string
 	var domainNameServers []string
 	for _, opt := range dhcp.Options {
@@ -33,8 +43,6 @@ if dhcpLayer := packet.Layer(layers.LayerTypeDHCPv4); dhcpLayer != nil {
 			}
 		}
 	}
-
-	// DHCP情報をブロックに追加
 	dhcpInfo := []string{
 		"Your IP: " + dhcp.YourClientIP.String(),
 		"Subnet Mask: " + subnetMask,
@@ -48,6 +56,5 @@ if dhcpLayer := packet.Layer(layers.LayerTypeDHCPv4); dhcpLayer != nil {
 	if len(domainNameServers) > 0 {
 		dhcpInfo = append(dhcpInfo, "Domain Name Servers: "+strings.Join(domainNameServers, ", "))
 	}
-
-	blocks = append(blocks, renderBlock(fmt.Sprintf("DHCP %s", dhcp.Operation.String()), dhcpInfo, color.New(color.FgHiCyan)))
+	return utils.RenderBlock(fmt.Sprintf("DHCP %s", dhcp.Operation.String()), dhcpInfo, color.New(color.FgHiCyan))
 }

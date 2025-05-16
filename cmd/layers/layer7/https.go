@@ -1,8 +1,16 @@
 package layer7
 
-// HTTPS (TCP 443)
-		if tcp.SrcPort == 443 || tcp.DstPort == 443 {
-			blocks = append(blocks, renderBlock("HTTPS", []string{
-				"Encrypted Traffic",
-			}, color.New(color.FgHiBlue)))
-		}
+import (
+	"github.com/fatih/color"
+	"github.com/google/gopacket"
+	"github.com/nagayon-935/DrawlScan/cmd/utils"
+)
+
+func PrintHttpsLayer(packet gopacket.Packet) []string {
+	// HTTPS (TCP 443)
+	var blocks []string
+	blocks = append(blocks, utils.RenderBlock("HTTPS", []string{
+		"Encrypted Traffic",
+	}, color.New(color.FgHiBlue)))
+	return blocks
+}

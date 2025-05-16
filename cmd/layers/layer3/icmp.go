@@ -1,12 +1,15 @@
 package layer3
 
-func printICMPLayer(packet gopacket.Packet) string {
-	blocks := []string{}
+import (
+	"github.com/fatih/color"
+	"github.com/google/gopacket"
+	"github.com/google/gopacket/layers"
+	"github.com/nagayon-935/DrawlScan/cmd/utils"
+)
 
-	// ICMP Layer
-	if icmpLayer := packet.Layer(layers.LayerTypeICMPv4); icmpLayer != nil {
-		icmp := icmpLayer.(*layers.ICMPv4)
-		blocks = append(blocks, renderBlock("ICMP Packet", []string{
-			"Type: " + icmp.TypeCode.String(),
-		}, color.New(color.FgHiMagenta)))
-	}
+func PrintIcmpLayer(packet gopacket.Packet) string {
+	icmp := packet.Layer(layers.LayerTypeICMPv4).(*layers.ICMPv4)
+	return utils.RenderBlock("ICMP Packet", []string{
+		"Type: " + icmp.TypeCode.String(),
+	}, color.New(color.FgHiMagenta))
+}
