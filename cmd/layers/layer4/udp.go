@@ -11,7 +11,7 @@ import (
 
 func PrintUdpLayer(packet gopacket.Packet) string {
 	udp := packet.Layer(layers.LayerTypeUDP).(*layers.UDP)
-	return utils.RenderBlock("UDP Datagram", []string{
+	return utils.RenderBlock("UDP Packet", []string{
 		fmt.Sprintf("Src Port: %d", udp.SrcPort),
 		fmt.Sprintf("Dst Port: %d", udp.DstPort),
 	}, color.New(color.FgBlue))

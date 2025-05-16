@@ -11,33 +11,16 @@ import (
 )
 
 func PrintDnsLayer(packet gopacket.Packet) string {
-	// DNS (UDP 53)
 	dns := packet.Layer(layers.LayerTypeDNS).(*layers.DNS)
 
-	if dns.Questions != nil {
-		return printDnsQuestion(dns)
-	}
-
+	var answerRecoard []string
 	if dns.Answers != nil {
-		return printDnsResponse(dns)
-	}
-	return "None"
-}
-
-func printDnsQuestion(dns *layers.DNS) string {
-	var queries []string
-	for _, q := range dns.Questions {
-		queries = append(queries, string(q.Name))
-	}
-	return utils.RenderBlock("DNS Queries", queries, color.New(color.FgHiYellow))
-}
-
-func printDnsResponse(dns *layers.DNS) string {
-	var responses []string
-	for _, a := range dns.Answers {
-		if a.Type == layers.DNSTypeA {
-			responses = append(responses, fmt.Sprintf("%s record: %s", a.Type.String(), net.IP(a.IP).String()))
+		for _, a := range dns.Answers {
+			if a.Type == layers.DNSTypeA {
+				answerRecoard = append(answerRecoard, fmt.Sprintf("%s -> %s", string(a.Name), net.IP(a.IP).String()))
+			}
 		}
+		return utils.RenderBlock("DNS Packet", answerRecoard, color.New(color.FgHiGreen))
 	}
-	return utils.RenderBlock("DNS Responses", responses, color.New(color.FgHiGreen))
+	return ""
 }

@@ -23,4 +23,6 @@ var Handlers = []struct {
 	{layers.LayerTypeUDP, layer4.PrintUdpLayer},
 	{layers.LayerTypeDNS, layer7.PrintDnsLayer},
 	{layers.LayerTypeDHCPv4, layer7.PrintDhcpLayer},
+	{layers.LayerTypeTCP, layer7.PrintHttpLayer},
+	{layers.LayerTypeTCP, layer7.PrintHttpsLayer},
 }
