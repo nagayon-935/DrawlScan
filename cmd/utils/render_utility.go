@@ -8,7 +8,7 @@ import (
 	"github.com/fatih/color"
 )
 
-func renderBlock(title string, lines []string, c *color.Color) string {
+func RenderBlock(title string, lines []string, c *color.Color) string {
 	var b strings.Builder
 
 	// 各ブロックの幅を動的に計算（色付けを無視して計算）
@@ -37,7 +37,7 @@ func renderBlock(title string, lines []string, c *color.Color) string {
 	return b.String()
 }
 
-func printHorizontalBlocks(blocks []string) {
+func PrintHorizontalBlocks(blocks []string) {
 	if len(blocks) == 0 {
 		return
 	}
@@ -81,9 +81,8 @@ func printHorizontalBlocks(blocks []string) {
 	fmt.Println()
 }
 
-// ANSIエスケープシーケンスを取り除く正規表現
-var ansiEscape = regexp.MustCompile(`\x1b\[[0-9;]*m`)
-
 func stripANSI(input string) string {
+	// ANSIエスケープシーケンスを取り除く正規表現
+	var ansiEscape = regexp.MustCompile(`\x1b\[[0-9;]*m`)
 	return ansiEscape.ReplaceAllString(input, "")
 }
