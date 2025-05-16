@@ -1,5 +1,1 @@
 package condition
-
-func CheckLayer() {
-
-}
