@@ -20,7 +20,9 @@ func PrintDnsLayer(packet gopacket.Packet) string {
 				answerRecoard = append(answerRecoard, fmt.Sprintf("%s -> %s", string(a.Name), net.IP(a.IP).String()))
 			}
 		}
-		return utils.RenderBlock("DNS Packet", answerRecoard, color.New(color.FgHiGreen))
+		if len(answerRecoard) > 0 {
+			return utils.RenderBlock("DNS Packet", answerRecoard, color.New(color.FgHiGreen))
+		}
 	}
 	return ""
 }
