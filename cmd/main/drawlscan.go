@@ -118,10 +118,6 @@ func buildFlagSet() (*flag.FlagSet, *options) {
 	return flags, opts
 }
 
-func hello() string {
-	return "Welcome to DrawlScan!"
-}
-
 func autoSelectInterface() string {
 	ifs, err := net.Interfaces()
 	if err != nil {
@@ -170,10 +166,15 @@ func isInterfaceConnected(ifaceName string) bool {
 	return false
 }
 
+// func optionHandler() {
+// 	flags, opts := buildFlagSet()
+// 	flags.Parse(args[1:])
+// }
+
 func goMain(args []string) int {
 	var iface string
-	flag.StringVar(&iface, "i", "", "network interface to capture packets from")
-	flag.Parse()
+
+	//optionHandler()
 
 	if iface == "" {
 		iface = autoSelectInterface()
@@ -199,9 +200,7 @@ func goMain(args []string) int {
 		}
 		utils.PrintHorizontalBlocks(blocks)
 	}
-	// flags, opts := buildFlagSet()
-	// flags.Parse(args[1:])
-	//fmt.Println("Parsed options:", opts.io.interfaceName)
+
 	return 0
 }
 
