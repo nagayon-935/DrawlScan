@@ -1,12 +1,12 @@
-package layer7
+package condition
 
 import (
 	"testing"
 )
 
-func TestPrintDnsLayer(t *testing.T) {
+func TestCondition(t *testing.T) {
 	// This test is not implemented yet.
-	// You can implement it by mocking the gopacket.Packet and layers.DNS types.
+	// You can implement it by mocking the gopacket.Packet and layers.UDP types.
 	// For now, we will just skip this test.
 	t.Skip("Test not implemented yet")
 }
