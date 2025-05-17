@@ -11,13 +11,27 @@ import (
 	"github.com/nagayon-935/DrawlScan/cmd/utils"
 )
 
-var httpMethods = [][]byte{
-	[]byte("GET "), []byte("POST "), []byte("HEAD "), []byte("PUT "),
-	[]byte("DELETE "), []byte("OPTIONS "), []byte("TRACE "), []byte("CONNECT "),
+func PrintAppLayer(packet gopacket.Packet) string {
+	protocol := DetectAppProtocol(packet)
+	switch protocol {
+	case "HTTP":
+		return printHttpInfo(packet)
+	case "HTTPS":
+		return utils.RenderBlock("HTTPS", []string{"Encrypted Payload"}, color.New(color.FgHiCyan))
+	case "QUIC":
+		return utils.RenderBlock("QUIC", []string{"Encrypted Payload"}, color.New(color.FgHiMagenta))
+	default:
+		return ""
+	}
 }
-var httpResponse = []byte("HTTP/")
 
 func DetectAppProtocol(packet gopacket.Packet) string {
+
+	var httpMethods = [][]byte{
+		[]byte("GET "), []byte("POST "), []byte("HEAD "), []byte("PUT "),
+		[]byte("DELETE "), []byte("OPTIONS "), []byte("TRACE "), []byte("CONNECT "),
+	}
+	var httpResponse = []byte("HTTP/")
 
 	tcpLayer := packet.Layer(layers.LayerTypeTCP)
 	udpLayer := packet.Layer(layers.LayerTypeUDP)
@@ -44,20 +58,6 @@ func DetectAppProtocol(packet gopacket.Packet) string {
 		}
 	}
 	return "Unknown"
-}
-
-func PrintAppLayer(packet gopacket.Packet) string {
-	protocol := DetectAppProtocol(packet)
-	switch protocol {
-	case "HTTP":
-		return printHttpInfo(packet)
-	case "HTTPS":
-		return utils.RenderBlock("HTTPS", []string{"Encrypted Payload"}, color.New(color.FgHiCyan))
-	case "QUIC":
-		return utils.RenderBlock("QUIC", []string{"Encrypted Payload"}, color.New(color.FgHiMagenta))
-	default:
-		return ""
-	}
 }
 
 // HTTPのメソッド・パス・Hostを抽出して表示
