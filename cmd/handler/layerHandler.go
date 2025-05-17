@@ -21,8 +21,8 @@ var Handlers = []struct {
 	{layers.LayerTypeARP, layer2.PrintARPLayer},
 	{layers.LayerTypeTCP, layer4.PrintTcpLayer},
 	{layers.LayerTypeUDP, layer4.PrintUdpLayer},
+	{layers.LayerTypeUDP, layer7.PrintAppLayer},
 	{layers.LayerTypeDNS, layer7.PrintDnsLayer},
 	{layers.LayerTypeDHCPv4, layer7.PrintDhcpLayer},
-	{layers.LayerTypeTCP, layer7.PrintHttpLayer},
-	{layers.LayerTypeTCP, layer7.PrintHttpsLayer},
+	{layers.LayerTypeTCP, layer7.PrintAppLayer},
 }
