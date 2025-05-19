@@ -27,13 +27,11 @@ Key Features:
 drawlscan [OPTION]
 OPTION
     -c, --count <NUM>              Capture only a specified number of packets
-    -d, --detail                   Show detailed packet information, including header fields and metadata
     -g, --geoip                    Show GeoIP information for source and destination IP addresses
     -h, --help                     Help message
     -i, --interface <INTERFACE>    Specify the network interface to capture packets from (e.g., eth0, wlan0).
     -o, --output <FILE>            Save the captured packets to a file in PCAP format
     -r, --rdns                     Perform reverse DNS lookups on source and destination IP addresses
-    -s, --summary                  Display a summary of captured packets by protocol, source, etc
     -t, --timeout <TIME>           Stop capturing after a specified number of seconds
     -v, --version                  Version information
     --ascii,                       Enable ASCII-art visualization of packets and traffic (Default is enable)
