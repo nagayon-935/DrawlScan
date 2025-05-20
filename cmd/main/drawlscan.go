@@ -34,31 +34,25 @@ func autoSelectInterface() string {
 
 	for _, iface := range ifs {
 
-		// インターフェイスが有効で、ループバックやトンネルでないものを選択
 		if (iface.Flags&net.FlagUp != 0) && (iface.Flags&net.FlagLoopback == 0) && !strings.HasPrefix(iface.Name, "utun") {
-			// 接続状態を確認
 			if isInterfaceConnected(iface.Name) {
 				return iface.Name
 			}
 		}
 	}
 
-	// 適切なインターフェイスが見つからない場合
 	fmt.Println("No suitable interface found.")
 	return ""
 }
 
 func isInterfaceConnected(ifaceName string) bool {
-	// pcap.FindAllDevs を使用して、利用可能なインターフェイスを取得
 	devices, err := pcap.FindAllDevs()
 	if err != nil {
 		return false
 	}
 
-	// 指定されたインターフェイスがデバイスリストに含まれているか確認
 	for _, dev := range devices {
 		if dev.Name == ifaceName {
-			// アドレスが存在する場合、接続されているとみなす
 			if len(dev.Addresses) > 0 {
 				return true
 			}
@@ -101,7 +95,6 @@ func goMain(args []string) int {
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 	packetChan := packetSource.Packets()
 
-	// タイムアウト用
 	var timeoutCh <-chan time.Time
 	if timeoutSec > 0 {
 		timeoutCh = time.After(time.Duration(timeoutSec) * time.Second)
@@ -142,17 +135,6 @@ loop:
 	fmt.Printf("Captured %d packets\n", received)
 	return 0
 }
-
-// packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
-// for packet := range packetSource.Packets() {
-// 	var blocks []string
-// 	for _, h := range handler.Handlers {
-// 		if packet.Layer(h.LayerType) != nil {
-// 			blocks = append(blocks, h.Handler(packet))
-// 		}
-// 	}
-// 	utils.PrintHorizontalBlocks(blocks)
-// }
 
 func main() {
 	status := goMain(os.Args)
