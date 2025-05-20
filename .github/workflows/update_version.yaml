@@ -1,4 +1,5 @@
 name: update version
+
 on:
   push:
     branches:
@@ -7,6 +8,7 @@ on:
 jobs:
   update-version:
     runs-on: ubuntu-latest
+
     steps:
       - name: Git Tag Name
         id: vars
@@ -14,13 +16,18 @@ jobs:
           echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
           echo "tag=${GITHUB_REF##**/v}" >> $GITHUB_OUTPUT
 
+      - uses: extractions/setup-just@v3
+        with:
+          just-version: '1.40.0'
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
           ref: ${{ steps.vars.outputs.branch }}
-        fetch-depth: 0
+          fetch-depth: 0
 
       - name: Initialize
+        shell: bash
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "action@github.com"
@@ -37,5 +44,5 @@ jobs:
       - name: Push branch
         uses: ad-m/github-push-action@master
         with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: ${{ steps.vars.outputs.branch }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ steps.vars.outputs.branch }}
