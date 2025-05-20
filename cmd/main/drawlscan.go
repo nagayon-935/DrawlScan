@@ -110,6 +110,9 @@ func goMain(args []string) int {
 	received := 0
 loop:
 	for {
+		if os.Getenv("CI") == "true" || os.Getenv("GITHUB_ACTIONS") == "true" {
+			fmt.Println("CI環境のためパケットキャプチャをスキップします")
+		}
 		select {
 		case packet, ok := <-packetChan:
 			if !ok {
