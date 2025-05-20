@@ -12,6 +12,7 @@ import (
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/pcap"
 	"github.com/nagayon-935/DrawlScan/cmd/handler"
+	"github.com/nagayon-935/DrawlScan/cmd/utils"
 )
 
 const (
@@ -71,7 +72,6 @@ func isInterfaceConnected(ifaceName string) bool {
 func goMain(args []string) int {
 	optionMap := handler.OptionHandler(args)
 
-	// インターフェイス取得
 	iface := ""
 	if v, ok := optionMap["InterfaceName"].(string); ok && v != "" {
 		iface = v
@@ -83,7 +83,6 @@ func goMain(args []string) int {
 		fmt.Printf("Using interface: %s\n", iface)
 	}
 
-	// キャプチャ件数とタイムアウト取得
 	count := 0
 	if v, ok := optionMap["Count"].(int); ok {
 		count = v
@@ -93,7 +92,6 @@ func goMain(args []string) int {
 		timeoutSec = v
 	}
 
-	// --- パケットキャプチャ処理例 ---
 	handle, err := pcap.OpenLive(iface, 65535, true, pcap.BlockForever)
 	if err != nil {
 		log.Fatal(err)
@@ -117,8 +115,13 @@ loop:
 			if !ok {
 				break loop
 			}
-			// パケット処理
-			fmt.Println(packet)
+			var blocks []string
+			for _, h := range handler.Handlers {
+				if packet.Layer(h.LayerType) != nil {
+					blocks = append(blocks, h.Handler(packet))
+				}
+			}
+			utils.PrintHorizontalBlocks(blocks)
 			received++
 			if count > 0 && received >= count {
 				break loop
@@ -127,26 +130,15 @@ loop:
 			fmt.Println("Timeout reached")
 			break loop
 		}
+		// ループを抜ける条件
+		if (count > 0 && received >= count) || (timeoutSec > 0 && timeoutCh != nil) {
+			break loop
+		}
 	}
 
 	fmt.Printf("Captured %d packets\n", received)
 	return 0
 }
-
-// var iface string
-// if iface == "" {
-// 	iface = autoSelectInterface()
-// 	if iface == "" {
-// 		log.Fatal("No suitable interface found")
-// 	}
-// 	fmt.Printf("Using interface: %s\n", iface)
-// }
-
-// handle, err := pcap.OpenLive(iface, snapshotLen, promiscuous, timeout)
-// if err != nil {
-// 	log.Fatal(err)
-// }
-// defer handle.Close()
 
 // packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 // for packet := range packetSource.Packets() {
