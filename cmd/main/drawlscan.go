@@ -22,12 +22,11 @@ func goMain(args []string) int {
 		version = optionMap["Version"].(bool)
 		// geoip    = optionMap["Geoip"].(bool)
 		distFilePath = optionMap["OutputFile"].(string)
-		// protocol = optionMap["Protocol"].(string)
-		// port     = optionMap["Port"].(int)
-		isAscii = !optionMap["NoAscii"].(bool)
-		iface   = optionMap["InterfaceName"].(string)
-		count   = optionMap["Count"].(int)
-		timeSec = optionMap["Time"].(int)
+		filter       = optionMap["Filter"].(string)
+		isAscii      = !optionMap["NoAscii"].(bool)
+		iface        = optionMap["InterfaceName"].(string)
+		count        = optionMap["Count"].(int)
+		timeSec      = optionMap["Time"].(int)
 	)
 
 	if help {
@@ -74,6 +73,12 @@ func goMain(args []string) int {
 		}
 	}
 
+	if filter != "" {
+		if err := handle.SetBPFFilter(filter); err != nil {
+			log.Fatalf("Failed to set BPF filter: %v", err)
+		}
+	}
+
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 	packetChan := packetSource.Packets()
 
@@ -86,7 +91,7 @@ func goMain(args []string) int {
 	fmt.Printf("Using interface: %s\n", iface)
 
 	done := false
-	start := time.Now() // キャプチャ開始時刻を記録
+	start := time.Now()
 
 	for !done {
 		if os.Getenv("CI") == "true" || os.Getenv("GITHUB_ACTIONS") == "true" {
