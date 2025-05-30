@@ -16,7 +16,6 @@ func AutoSelectInterface() string {
 		log.Fatal("Failed to get interfaces:", err)
 	}
 
-	// インターフェイスをインデックスの昇順でソート
 	sort.Slice(ifs, func(i, j int) bool {
 		return ifs[i].Index < ifs[j].Index
 	})
