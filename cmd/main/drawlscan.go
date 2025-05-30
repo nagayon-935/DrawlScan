@@ -18,9 +18,9 @@ import (
 func goMain(args []string) int {
 	optionMap := handler.Options(args)
 	var (
-		help    = optionMap["Help"].(bool)
-		version = optionMap["Version"].(bool)
-		// geoip    = optionMap["Geoip"].(bool)
+		help         = optionMap["Help"].(bool)
+		version      = optionMap["Version"].(bool)
+		geoip        = optionMap["Geoip"].(bool)
 		distFilePath = optionMap["OutputFile"].(string)
 		filter       = optionMap["Filter"].(string)
 		isAscii      = !optionMap["NoAscii"].(bool)
@@ -38,7 +38,11 @@ func goMain(args []string) int {
 		fmt.Println("Version: " + VERSION)
 		return 0
 	}
-	fmt.Println(iface)
+
+	if geoip {
+		utils.InitGeoIP()
+	}
+
 	if iface == "" {
 		iface = utils.AutoSelectInterface()
 		if iface == "" {
@@ -110,15 +114,22 @@ func goMain(args []string) int {
 					blocks = append(blocks, h.Handler(packet))
 				}
 			}
-			if isAscii {
-				utils.PrintHorizontalBlocks(blocks)
-			} else {
-				fmt.Println(packet)
-			}
 			if distFile != nil {
 				if err := pcapw.WritePacket(packet.Metadata().CaptureInfo, packet.Data()); err != nil {
 					log.Fatalf("pcap.WritePacket(): %v", err)
 				}
+			}
+			if geoip {
+				if netLayer := packet.NetworkLayer(); netLayer != nil {
+					src, dst := netLayer.NetworkFlow().Endpoints()
+					blocks = append(blocks, utils.LookupCountry(src.String()))
+					blocks = append(blocks, utils.LookupCountry(dst.String()))
+				}
+			}
+			if isAscii {
+				utils.PrintHorizontalBlocks(blocks)
+			} else {
+				fmt.Println(packet)
 			}
 			received++
 			if count > 0 && received >= count {
