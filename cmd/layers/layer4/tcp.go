@@ -16,7 +16,7 @@ func PrintTcpLayer(packet gopacket.Packet) string {
 	return utils.RenderBlock("TCP Packet", []string{
 		fmt.Sprintf("Src Port: %d", tcp.SrcPort),
 		fmt.Sprintf("Dst Port: %d", tcp.DstPort),
-		fmt.Sprintf("Flags: " + tcpFlagsString(tcp)),
+		fmt.Sprintf("Flags: %s", tcpFlagsString(tcp)),
 	}, color.New(color.FgMagenta))
 }
 
