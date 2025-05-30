@@ -17,7 +17,6 @@ It’s like tcpdump, but with an artistic flair.
 Key Features:  
     •   🎨 Visualize packet structures (Ethernet/IP/TCP/UDP/etc.) as ASCII diagrams  
     •   🌍 GeoIP-based source/destination display  
-    •   🔎 Reverse DNS lookup of IPs  
     •   🧭 Lightweight, TUI-style interface — no GUI required  
     •   🐧 Perfect for learning, demos, or simply keeping an eye on your machine  
 
@@ -33,7 +32,6 @@ OPTION
     -o, --output <FILE>            Save the captured packets to a file in PCAP format
     -t, --timeout <TIME>           Stop capturing after a specified number of seconds
     -v, --version                  Version information
-    --ascii,                       Enable ASCII-art visualization of packets and traffic (Default is enable)
     --no-ascii,                    Disable ASCII-art output
 ```
 
