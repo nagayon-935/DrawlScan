@@ -3,87 +3,49 @@ package main
 import (
 	"fmt"
 	"log"
-	"net"
 	"os"
-	"sort"
+	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/pcap"
+	"github.com/google/gopacket/pcapgo"
 	"github.com/nagayon-935/DrawlScan/cmd/handler"
 	"github.com/nagayon-935/DrawlScan/cmd/utils"
 )
 
-const (
-	snapshotLen = 1024
-	promiscuous = true
-	timeout     = pcap.BlockForever
-)
-
-func autoSelectInterface() string {
-	ifs, err := net.Interfaces()
-	if err != nil {
-		log.Fatal("Failed to get interfaces:", err)
-	}
-
-	// インターフェイスをインデックスの昇順でソート
-	sort.Slice(ifs, func(i, j int) bool {
-		return ifs[i].Index < ifs[j].Index
-	})
-
-	for _, iface := range ifs {
-
-		if (iface.Flags&net.FlagUp != 0) && (iface.Flags&net.FlagLoopback == 0) && !strings.HasPrefix(iface.Name, "utun") {
-			if isInterfaceConnected(iface.Name) {
-				return iface.Name
-			}
-		}
-	}
-
-	fmt.Println("No suitable interface found.")
-	return ""
-}
-
-func isInterfaceConnected(ifaceName string) bool {
-	devices, err := pcap.FindAllDevs()
-	if err != nil {
-		return false
-	}
-
-	for _, dev := range devices {
-		if dev.Name == ifaceName {
-			if len(dev.Addresses) > 0 {
-				return true
-			}
-			return false
-		}
-	}
-
-	return false
-}
-
 func goMain(args []string) int {
-	optionMap := handler.OptionHandler(args)
+	optionMap := handler.Options(args)
+	var (
+		help    = optionMap["Help"].(bool)
+		version = optionMap["Version"].(bool)
+		// geoip    = optionMap["Geoip"].(bool)
+		distFilePath = optionMap["OutputFile"].(string)
+		// protocol = optionMap["Protocol"].(string)
+		// port     = optionMap["Port"].(int)
+		isAscii = !optionMap["NoAscii"].(bool)
+		iface   = optionMap["InterfaceName"].(string)
+		count   = optionMap["Count"].(int)
+		timeSec = optionMap["Time"].(int)
+	)
 
-	iface := ""
-	if v, ok := optionMap["InterfaceName"].(string); ok && v != "" {
-		iface = v
-	} else {
-		iface = autoSelectInterface()
+	if help {
+		fmt.Println(handler.HelpMessage())
+		return 0
+	}
+
+	if version {
+		fmt.Println("Version: " + VERSION)
+		return 0
+	}
+	fmt.Println(iface)
+	if iface == "" {
+		iface = utils.AutoSelectInterface()
 		if iface == "" {
 			log.Fatal("No suitable interface found")
+			return 1
 		}
-		fmt.Printf("Using interface: %s\n", iface)
-	}
-
-	count := 0
-	if v, ok := optionMap["Count"].(int); ok {
-		count = v
-	}
-	timeoutSec := 0
-	if v, ok := optionMap["Timeout"].(int); ok {
-		timeoutSec = v
 	}
 
 	handle, err := pcap.OpenLive(iface, 65535, true, pcap.BlockForever)
@@ -92,24 +54,50 @@ func goMain(args []string) int {
 	}
 	defer handle.Close()
 
+	var distFile *os.File
+	var pcapw *pcapgo.Writer
+	if distFilePath != "" {
+		ext := strings.ToLower(filepath.Ext(distFilePath))
+		if ext != ".pcap" && ext != ".pcapng" {
+			log.Fatalf("Output file must have .pcap or .pcapng extension: %s", distFilePath)
+			return 1
+		}
+		var err error
+		distFile, err = os.Create(distFilePath)
+		if err != nil {
+			log.Fatalf("Failed to create output file: %v", err)
+		}
+		defer distFile.Close()
+		pcapw = pcapgo.NewWriter(distFile)
+		if err := pcapw.WriteFileHeader(1600, handle.LinkType()); err != nil {
+			log.Fatalf("WriteFileHeader: %v", err)
+		}
+	}
+
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 	packetChan := packetSource.Packets()
 
-	var timeoutCh <-chan time.Time
-	if timeoutSec > 0 {
-		timeoutCh = time.After(time.Duration(timeoutSec) * time.Second)
+	var timeCh <-chan time.Time
+	if timeSec > 0 {
+		timeCh = time.After(time.Duration(timeSec) * time.Second)
 	}
-
 	received := 0
-loop:
-	for {
+
+	fmt.Printf("Using interface: %s\n", iface)
+
+	done := false
+	start := time.Now() // キャプチャ開始時刻を記録
+
+	for !done {
 		if os.Getenv("CI") == "true" || os.Getenv("GITHUB_ACTIONS") == "true" {
 			fmt.Println("CI環境のためパケットキャプチャをスキップします")
+			//testdataからpcapファイルをインポートしてテストを行う
+			return 0
 		}
 		select {
 		case packet, ok := <-packetChan:
 			if !ok {
-				break loop
+				done = true
 			}
 			var blocks []string
 			for _, h := range handler.Handlers {
@@ -117,22 +105,31 @@ loop:
 					blocks = append(blocks, h.Handler(packet))
 				}
 			}
-			utils.PrintHorizontalBlocks(blocks)
+			if isAscii {
+				utils.PrintHorizontalBlocks(blocks)
+			} else {
+				fmt.Println(packet)
+			}
+			if distFile != nil {
+				if err := pcapw.WritePacket(packet.Metadata().CaptureInfo, packet.Data()); err != nil {
+					log.Fatalf("pcap.WritePacket(): %v", err)
+				}
+			}
 			received++
 			if count > 0 && received >= count {
-				break loop
+				done = true
 			}
-		case <-timeoutCh:
-			fmt.Println("Timeout reached")
-			break loop
+		case <-timeCh:
+			done = true
 		}
-		// ループを抜ける条件
-		if (count > 0 && received >= count) || (timeoutSec > 0 && timeoutCh != nil) {
-			break loop
+		if count > 0 && received >= count {
+			done = true
 		}
 	}
 
+	elapsed := time.Since(start)
 	fmt.Printf("Captured %d packets\n", received)
+	fmt.Printf("Capture duration: %.2f seconds\n", elapsed.Seconds())
 	return 0
 }
 
