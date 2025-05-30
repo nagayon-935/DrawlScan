@@ -1,6 +1,6 @@
 module github.com/nagayon-935/DrawlScan
 
-go 1.22.4
+go 1.24.3
 
 require (
 	github.com/fatih/color v1.18.0
@@ -11,5 +11,7 @@ require (
 require (
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
+	github.com/oschwald/geoip2-golang v1.11.0 // indirect
+	github.com/oschwald/maxminddb-golang v1.13.0 // indirect
 	golang.org/x/sys v0.25.0 // indirect
 )
