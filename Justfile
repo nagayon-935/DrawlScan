@@ -13,7 +13,7 @@ Version := `grep '^const VERSION = ' cmd/main/version.go | sed "s/^VERSION = \"\
 
 # bulid the applicaion with running tests
 build: test
-    go build -o drawlscan cmd/main/drawlscan.go
+    go build -o drawlscan cmd/main/drawlscan.go cmd/main/version.go
 
 # run tests and generate the coverage report
 test:
