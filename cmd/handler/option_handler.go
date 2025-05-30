@@ -8,9 +8,8 @@ import (
 )
 
 type analysisOption struct {
-	Geoip    bool
-	Protocol string
-	Port     int
+	Geoip  bool
+	Filter string
 }
 
 type captureOption struct {
@@ -46,12 +45,20 @@ func HelpMessage() string {
 
 OPTIONS:
     -c, --count <NUM>              Capture only a specified number of packets
+    -f, --filter <REGX>            Filter packets using a BPF (Berkeley Packet Filter) expression.
+                                   You can specify filters such as:
+                                     - ip src 192.168.1.1
+                                     - ip dst 192.168.1.2
+                                     - ip host 192.168.1.1 and ip host 192.168.1.2
+                                     - tcp port 80
+                                     - udp port 53
+                                     - icmp or icmp6
+                                     - vlan 100
+                                     - ip host 192.168.1.1 and tcp port 80
     -g, --geoip                    Show GeoIP information for source and destination IP addresses
     -h, --help                     Display this help message
     -i, --interface <INTERFACE>    Specify the network interface to capture packets from (e.g., eth0, wlan0)
     -o, --output <FILE>            Save the captured packets to a file in PCAP format
-    -p, --protocol <PROTOCOL>      Filter packets by protocol (e.g., TCP, UDP, ICMP)
-    -P, --port <PORT>              Filter packets by port number (e.g., 80, 443)
     -t, --time <TIME>              Stop capturing after a specified number of seconds
     -v, --version                  Show version information
     --no-ascii                     Disable ASCII-art output
@@ -71,8 +78,7 @@ func buildFlagSet() (*flag.FlagSet, *options) {
 	flags.Usage = func() { fmt.Println(HelpMessage()) }
 
 	flags.BoolVarP(&opts.Analysis.Geoip, "geoip", "g", false, "Show GeoIP information for source and destination IP addresses")
-	flags.StringVarP(&opts.Analysis.Protocol, "protocol", "p", "all", "Filter packets by protocol (e.g., TCP, UDP, ICMP)")
-	flags.IntVarP(&opts.Analysis.Port, "port", "P", -1, "Filter packets by port number (e.g., 80, 443)")
+	flags.StringVarP(&opts.Analysis.Filter, "filter", "f", "", "Filter packets")
 
 	flags.IntVarP(&opts.Capture.Count, "count", "c", -1, "Capture only a specified number of packets")
 	flags.IntVarP(&opts.Capture.Time, "time", "t", -1, "Stop capturing after a specified number of seconds")
