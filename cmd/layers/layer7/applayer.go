@@ -19,7 +19,7 @@ func PrintAppLayer(packet gopacket.Packet) string {
 	case "HTTPS":
 		return utils.RenderBlock("HTTPS", []string{"Encrypted Payload"}, color.New(color.FgHiCyan))
 	case "QUIC":
-		return utils.RenderBlock("QUIC", []string{"Encrypted Payload"}, color.New(color.FgHiMagenta))
+		return utils.RenderBlock("QUIC", []string{"Encrypted Payload"}, color.New(color.FgHiBlack))
 	default:
 		return ""
 	}
