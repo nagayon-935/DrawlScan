@@ -8,15 +8,13 @@ import (
 )
 
 type analysisOption struct {
-	Geoip    bool
-	Rdns     bool
-	Protocol string
-	Port     string
+	Geoip  bool
+	Filter string
 }
 
 type captureOption struct {
-	Count   int
-	Timeout int
+	Count int
+	Time  int
 }
 
 type generalOption struct {
@@ -42,21 +40,27 @@ type options struct {
 	Visualization *visualizationOption
 }
 
-func helpMessage() string {
+func HelpMessage() string {
 	return `Usage: drawlscan [OPTIONS]
 
 OPTIONS:
     -c, --count <NUM>              Capture only a specified number of packets
+    -f, --filter <REGX>            Filter packets using a BPF (Berkeley Packet Filter) expression.
+                                   You can specify filters such as:
+                                     - ip src 192.168.1.1
+                                     - ip dst 192.168.1.2
+                                     - ip host 192.168.1.1 and ip host 192.168.1.2
+                                     - tcp port 80
+                                     - udp port 53
+                                     - icmp or icmp6
+                                     - vlan 100
+                                     - ip host 192.168.1.1 and tcp port 80
     -g, --geoip                    Show GeoIP information for source and destination IP addresses
     -h, --help                     Display this help message
     -i, --interface <INTERFACE>    Specify the network interface to capture packets from (e.g., eth0, wlan0)
     -o, --output <FILE>            Save the captured packets to a file in PCAP format
-	-p, --protocol <PROTOCOL>        Filter packets by protocol (e.g., TCP, UDP, ICMP)
-	-P, --port <PORT>              Filter packets by port number (e.g., 80, 443)
-    -r, --rdns                     Perform reverse DNS lookups on source and destination IP addresses
-    -t, --timeout <TIME>           Stop capturing after a specified number of seconds
+    -t, --time <TIME>              Stop capturing after a specified number of seconds
     -v, --version                  Show version information
-    --ascii                        Enable ASCII-art visualization of packets and traffic (Default is enabled)
     --no-ascii                     Disable ASCII-art output
 `
 }
@@ -71,15 +75,13 @@ func buildFlagSet() (*flag.FlagSet, *options) {
 	}
 
 	flags := flag.NewFlagSet("drawlscan", flag.ContinueOnError)
-	flags.Usage = func() { fmt.Println(helpMessage()) }
+	flags.Usage = func() { fmt.Println(HelpMessage()) }
 
 	flags.BoolVarP(&opts.Analysis.Geoip, "geoip", "g", false, "Show GeoIP information for source and destination IP addresses")
-	flags.BoolVarP(&opts.Analysis.Rdns, "rdns", "r", false, "Perform reverse DNS lookups on source and destination IP addresses")
-	flags.StringVarP(&opts.Analysis.Protocol, "protocol", "p", "all", "Filter packets by protocol (e.g., TCP, UDP, ICMP)")
-	flags.StringVarP(&opts.Analysis.Port, "port", "P", "all", "Filter packets by port number (e.g., 80, 443)")
+	flags.StringVarP(&opts.Analysis.Filter, "filter", "f", "", "Filter packets")
 
-	flags.IntVarP(&opts.Capture.Count, "count", "c", 0, "Capture only a specified number of packets")
-	flags.IntVarP(&opts.Capture.Timeout, "timeout", "t", 0, "Stop capturing after a specified number of seconds")
+	flags.IntVarP(&opts.Capture.Count, "count", "c", -1, "Capture only a specified number of packets")
+	flags.IntVarP(&opts.Capture.Time, "time", "t", -1, "Stop capturing after a specified number of seconds")
 
 	flags.BoolVarP(&opts.General.Help, "help", "h", false, "Help message")
 	flags.BoolVarP(&opts.General.Version, "version", "v", false, "Version information")
@@ -87,7 +89,6 @@ func buildFlagSet() (*flag.FlagSet, *options) {
 	flags.StringVarP(&opts.Io.InterfaceName, "interface", "i", "", "Specify the network interface to capture packets from (e.g., eth0, wlan0)")
 	flags.StringVarP(&opts.Io.OutputFile, "output", "o", "", " Save the captured packets to a file in PCAP format")
 
-	flags.BoolVar(&opts.Visualization.Ascii, "ascii", true, "Enable ASCII-art visualization of packets and traffic (Default is enable)")
 	flags.BoolVar(&opts.Visualization.NoAscii, "no-ascii", false, "Disable ASCII-art output")
 
 	return flags, opts
@@ -111,10 +112,9 @@ func collectFieldMap(value reflect.Value, optionMap map[string]interface{}) {
 	}
 }
 
-func OptionHandler(optArgs []string) map[string]interface{} {
+func Options(optArgs []string) map[string]interface{} {
 	flags, options := buildFlagSet()
 	flags.Parse(optArgs[1:])
-
 	optionMap := make(map[string]interface{})
 	collectFieldMap(reflect.ValueOf(options), optionMap)
 	return optionMap
