@@ -31,7 +31,6 @@ OPTION
     -h, --help                     Help message
     -i, --interface <INTERFACE>    Specify the network interface to capture packets from (e.g., eth0, wlan0).
     -o, --output <FILE>            Save the captured packets to a file in PCAP format
-    -r, --rdns                     Perform reverse DNS lookups on source and destination IP addresses
     -t, --timeout <TIME>           Stop capturing after a specified number of seconds
     -v, --version                  Version information
     --ascii,                       Enable ASCII-art visualization of packets and traffic (Default is enable)
