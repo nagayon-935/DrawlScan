@@ -10,12 +10,12 @@ import (
 type analysisOption struct {
 	Geoip    bool
 	Protocol string
-	Port     string
+	Port     int
 }
 
 type captureOption struct {
-	Count   int
-	Timeout int
+	Count int
+	Time  int
 }
 
 type generalOption struct {
@@ -50,11 +50,10 @@ OPTIONS:
     -h, --help                     Display this help message
     -i, --interface <INTERFACE>    Specify the network interface to capture packets from (e.g., eth0, wlan0)
     -o, --output <FILE>            Save the captured packets to a file in PCAP format
-    -p, --protocol <PROTOCOL>        Filter packets by protocol (e.g., TCP, UDP, ICMP)
+    -p, --protocol <PROTOCOL>      Filter packets by protocol (e.g., TCP, UDP, ICMP)
     -P, --port <PORT>              Filter packets by port number (e.g., 80, 443)
-    -t, --timeout <TIME>           Stop capturing after a specified number of seconds
+    -t, --time <TIME>              Stop capturing after a specified number of seconds
     -v, --version                  Show version information
-    --ascii                        Enable ASCII-art visualization of packets and traffic (Default is enabled)
     --no-ascii                     Disable ASCII-art output
 `
 }
@@ -73,10 +72,10 @@ func buildFlagSet() (*flag.FlagSet, *options) {
 
 	flags.BoolVarP(&opts.Analysis.Geoip, "geoip", "g", false, "Show GeoIP information for source and destination IP addresses")
 	flags.StringVarP(&opts.Analysis.Protocol, "protocol", "p", "all", "Filter packets by protocol (e.g., TCP, UDP, ICMP)")
-	flags.StringVarP(&opts.Analysis.Port, "port", "P", "all", "Filter packets by port number (e.g., 80, 443)")
+	flags.IntVarP(&opts.Analysis.Port, "port", "P", -1, "Filter packets by port number (e.g., 80, 443)")
 
-	flags.IntVarP(&opts.Capture.Count, "count", "c", 0, "Capture only a specified number of packets")
-	flags.IntVarP(&opts.Capture.Timeout, "timeout", "t", 0, "Stop capturing after a specified number of seconds")
+	flags.IntVarP(&opts.Capture.Count, "count", "c", -1, "Capture only a specified number of packets")
+	flags.IntVarP(&opts.Capture.Time, "time", "t", -1, "Stop capturing after a specified number of seconds")
 
 	flags.BoolVarP(&opts.General.Help, "help", "h", false, "Help message")
 	flags.BoolVarP(&opts.General.Version, "version", "v", false, "Version information")
@@ -84,7 +83,6 @@ func buildFlagSet() (*flag.FlagSet, *options) {
 	flags.StringVarP(&opts.Io.InterfaceName, "interface", "i", "", "Specify the network interface to capture packets from (e.g., eth0, wlan0)")
 	flags.StringVarP(&opts.Io.OutputFile, "output", "o", "", " Save the captured packets to a file in PCAP format")
 
-	flags.BoolVar(&opts.Visualization.Ascii, "ascii", true, "Enable ASCII-art visualization of packets and traffic (Default is enable)")
 	flags.BoolVar(&opts.Visualization.NoAscii, "no-ascii", false, "Disable ASCII-art output")
 
 	return flags, opts
