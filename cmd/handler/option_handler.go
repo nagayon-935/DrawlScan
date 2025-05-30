@@ -9,7 +9,6 @@ import (
 
 type analysisOption struct {
 	Geoip    bool
-	Rdns     bool
 	Protocol string
 	Port     string
 }
@@ -42,7 +41,7 @@ type options struct {
 	Visualization *visualizationOption
 }
 
-func helpMessage() string {
+func HelpMessage() string {
 	return `Usage: drawlscan [OPTIONS]
 
 OPTIONS:
@@ -51,9 +50,8 @@ OPTIONS:
     -h, --help                     Display this help message
     -i, --interface <INTERFACE>    Specify the network interface to capture packets from (e.g., eth0, wlan0)
     -o, --output <FILE>            Save the captured packets to a file in PCAP format
-	-p, --protocol <PROTOCOL>        Filter packets by protocol (e.g., TCP, UDP, ICMP)
-	-P, --port <PORT>              Filter packets by port number (e.g., 80, 443)
-    -r, --rdns                     Perform reverse DNS lookups on source and destination IP addresses
+    -p, --protocol <PROTOCOL>        Filter packets by protocol (e.g., TCP, UDP, ICMP)
+    -P, --port <PORT>              Filter packets by port number (e.g., 80, 443)
     -t, --timeout <TIME>           Stop capturing after a specified number of seconds
     -v, --version                  Show version information
     --ascii                        Enable ASCII-art visualization of packets and traffic (Default is enabled)
@@ -71,10 +69,9 @@ func buildFlagSet() (*flag.FlagSet, *options) {
 	}
 
 	flags := flag.NewFlagSet("drawlscan", flag.ContinueOnError)
-	flags.Usage = func() { fmt.Println(helpMessage()) }
+	flags.Usage = func() { fmt.Println(HelpMessage()) }
 
 	flags.BoolVarP(&opts.Analysis.Geoip, "geoip", "g", false, "Show GeoIP information for source and destination IP addresses")
-	flags.BoolVarP(&opts.Analysis.Rdns, "rdns", "r", false, "Perform reverse DNS lookups on source and destination IP addresses")
 	flags.StringVarP(&opts.Analysis.Protocol, "protocol", "p", "all", "Filter packets by protocol (e.g., TCP, UDP, ICMP)")
 	flags.StringVarP(&opts.Analysis.Port, "port", "P", "all", "Filter packets by port number (e.g., 80, 443)")
 
@@ -111,10 +108,9 @@ func collectFieldMap(value reflect.Value, optionMap map[string]interface{}) {
 	}
 }
 
-func OptionHandler(optArgs []string) map[string]interface{} {
+func Options(optArgs []string) map[string]interface{} {
 	flags, options := buildFlagSet()
 	flags.Parse(optArgs[1:])
-
 	optionMap := make(map[string]interface{})
 	collectFieldMap(reflect.ValueOf(options), optionMap)
 	return optionMap
