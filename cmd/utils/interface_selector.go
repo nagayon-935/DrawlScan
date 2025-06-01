@@ -2,7 +2,6 @@ package utils
 
 import (
 	"fmt"
-	"log"
 	"net"
 	"sort"
 	"strings"
@@ -13,7 +12,7 @@ import (
 func AutoSelectInterface() string {
 	ifs, err := net.Interfaces()
 	if err != nil {
-		log.Fatal("Failed to get interfaces:", err)
+		fmt.Println("Failed to get interfaces:", err)
 	}
 
 	sort.Slice(ifs, func(i, j int) bool {
@@ -21,7 +20,6 @@ func AutoSelectInterface() string {
 	})
 
 	for _, iface := range ifs {
-
 		if (iface.Flags&net.FlagUp != 0) && (iface.Flags&net.FlagLoopback == 0) && !strings.HasPrefix(iface.Name, "utun") {
 			if isInterfaceConnected(iface.Name) {
 				return iface.Name

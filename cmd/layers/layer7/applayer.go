@@ -26,7 +26,6 @@ func PrintAppLayer(packet gopacket.Packet) string {
 }
 
 func DetectAppProtocol(packet gopacket.Packet) string {
-
 	var httpMethods = [][]byte{
 		[]byte("GET "), []byte("POST "), []byte("HEAD "), []byte("PUT "),
 		[]byte("DELETE "), []byte("OPTIONS "), []byte("TRACE "), []byte("CONNECT "),
@@ -60,7 +59,6 @@ func DetectAppProtocol(packet gopacket.Packet) string {
 	return "Unknown"
 }
 
-// HTTPのメソッド・パス・Hostを抽出して表示
 func printHttpInfo(packet gopacket.Packet) string {
 	tcpLayer := packet.Layer(layers.LayerTypeTCP)
 	if tcpLayer == nil {
@@ -75,7 +73,6 @@ func printHttpInfo(packet gopacket.Packet) string {
 	scanner := bufio.NewScanner(bytes.NewReader(payload))
 	var method, path, host string
 
-	// 1行目: メソッドとパス
 	if scanner.Scan() {
 		line := scanner.Text()
 		parts := strings.SplitN(line, " ", 3)
@@ -84,7 +81,7 @@ func printHttpInfo(packet gopacket.Packet) string {
 			path = parts[1]
 		}
 	}
-	// ヘッダからHostを探す
+
 	for scanner.Scan() {
 		line := scanner.Text()
 		if strings.HasPrefix(line, "Host:") {
