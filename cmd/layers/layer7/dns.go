@@ -12,8 +12,8 @@ import (
 
 func PrintDnsLayer(packet gopacket.Packet) string {
 	dns := packet.Layer(layers.LayerTypeDNS).(*layers.DNS)
-
 	var answerRecoard []string
+
 	if dns.Answers != nil {
 		for _, a := range dns.Answers {
 			if a.Type == layers.DNSTypeA {
@@ -24,5 +24,6 @@ func PrintDnsLayer(packet gopacket.Packet) string {
 			return utils.RenderBlock("DNS Packet", answerRecoard, color.New(color.FgHiGreen))
 		}
 	}
+
 	return ""
 }

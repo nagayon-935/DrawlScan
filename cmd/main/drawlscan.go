@@ -1,8 +1,12 @@
 package main
 
+/*
+全国一斉リファクタリング祭りをv0.2.1
+テストコードの追加をv0.3.0で行います
+テストはgopacketでパケット作ればええか（実際のキャプチャファイルよりこっちの方がいいだろう）
+*/
 import (
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -46,14 +50,15 @@ func goMain(args []string) int {
 	if iface == "" {
 		iface = utils.AutoSelectInterface()
 		if iface == "" {
-			log.Fatal("No suitable interface found")
+			fmt.Println("No suitable interface found")
 			return 1
 		}
 	}
 
 	handle, err := pcap.OpenLive(iface, 65535, true, pcap.BlockForever)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
+		return 1
 	}
 	defer handle.Close()
 
@@ -62,24 +67,27 @@ func goMain(args []string) int {
 	if distFilePath != "" {
 		ext := strings.ToLower(filepath.Ext(distFilePath))
 		if ext != ".pcap" && ext != ".pcapng" {
-			log.Fatalf("Output file must have .pcap or .pcapng extension: %s", distFilePath)
+			fmt.Println("Output file must have .pcap or .pcapng extension: ", distFilePath)
 			return 1
 		}
 		var err error
 		distFile, err = os.Create(distFilePath)
 		if err != nil {
-			log.Fatalf("Failed to create output file: %v", err)
+			fmt.Println("Failed to create output file: ", err)
+			return 1
 		}
 		defer distFile.Close()
 		pcapw = pcapgo.NewWriter(distFile)
 		if err := pcapw.WriteFileHeader(1600, handle.LinkType()); err != nil {
-			log.Fatalf("WriteFileHeader: %v", err)
+			fmt.Println("WriteFileHeader: ", err)
+			return 1
 		}
 	}
 
 	if filter != "" {
 		if err := handle.SetBPFFilter(filter); err != nil {
-			log.Fatalf("Failed to set BPF filter: %v", err)
+			fmt.Println("Failed to set BPF filter: ", err)
+			return 1
 		}
 	}
 
@@ -92,7 +100,7 @@ func goMain(args []string) int {
 	}
 	received := 0
 
-	fmt.Printf("Using interface: %s\n", iface)
+	fmt.Println("Using interface: ", iface)
 
 	done := false
 	start := time.Now()
@@ -116,7 +124,8 @@ func goMain(args []string) int {
 			}
 			if distFile != nil {
 				if err := pcapw.WritePacket(packet.Metadata().CaptureInfo, packet.Data()); err != nil {
-					log.Fatalf("pcap.WritePacket(): %v", err)
+					fmt.Println("pcap.WritePacket(): ", err)
+					return 1
 				}
 			}
 			if geoip {
@@ -132,9 +141,6 @@ func goMain(args []string) int {
 				fmt.Println(packet)
 			}
 			received++
-			if count > 0 && received >= count {
-				done = true
-			}
 		case <-timeCh:
 			done = true
 		}
@@ -143,6 +149,7 @@ func goMain(args []string) int {
 		}
 	}
 
+	utils.CloseGeoIP()
 	elapsed := time.Since(start)
 	fmt.Printf("Captured %d packets\n", received)
 	fmt.Printf("Capture duration: %.2f seconds\n", elapsed.Seconds())

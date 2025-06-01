@@ -7,9 +7,6 @@ import (
 	"github.com/nagayon-935/DrawlScan/cmd/utils"
 )
 
-/*
-* @Author: nagayon935
- */
 func PrintEthernetLayer(packet gopacket.Packet) string {
 	eth := packet.Layer(layers.LayerTypeEthernet).(*layers.Ethernet)
 	return utils.RenderBlock("Ethernet Frame", []string{

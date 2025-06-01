@@ -2,7 +2,6 @@ package utils
 
 import (
 	"fmt"
-	"log"
 	"net"
 
 	"github.com/fatih/color"
@@ -15,32 +14,28 @@ var geoipAsDB *geoip2.Reader
 func InitGeoIP() {
 	var err error
 	if geoipCityDB, err = geoip2.Open("./cmd/utils/geodata/GeoLite2-City.mmdb"); err != nil {
-		log.Fatalf("GeoIP DB open error: %v", err)
+		fmt.Println("GeoIP DB open error: ", err)
 	}
 	if geoipAsDB, err = geoip2.Open("./cmd/utils/geodata/GeoLite2-ASN.mmdb"); err != nil {
-		log.Fatalf("GeoIP DB open error: %v", err)
+		fmt.Println("GeoIP DB open error :", err)
+	}
+}
+
+func CloseGeoIP() {
+	if geoipCityDB != nil {
+		_ = geoipCityDB.Close()
+	}
+	if geoipAsDB != nil {
+		_ = geoipAsDB.Close()
 	}
 }
 
 // IPアドレスから国情報を取得
 func LookupCountry(ipStr string) string {
-	if geoipCityDB == nil {
-		return ""
-	}
 	ip := net.ParseIP(ipStr)
-	if ip == nil {
-		return ""
-	}
 
-	CountryRecord, err := geoipCityDB.Country(ip)
-	if err != nil {
-		return ""
-	}
-
-	AsRecord, err := geoipAsDB.ASN(ip)
-	if err != nil {
-		return ""
-	}
+	CountryRecord, _ := geoipCityDB.Country(ip)
+	AsRecord, _ := geoipAsDB.ASN(ip)
 
 	if CountryRecord.Country.Names["en"] == "" || AsRecord.AutonomousSystemOrganization == "" {
 		return RenderBlock(fmt.Sprintf("GeoIP"), []string{"None"}, color.New(color.FgHiRed))
