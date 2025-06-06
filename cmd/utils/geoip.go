@@ -13,10 +13,10 @@ var geoipAsDB *geoip2.Reader
 
 func InitGeoIP() {
 	var err error
-	if geoipCityDB, err = geoip2.Open("./cmd/utils/geodata/GeoLite2-City.mmdb"); err != nil {
+	if geoipCityDB, err = geoip2.Open("./geodata/GeoLite2-City.mmdb"); err != nil {
 		fmt.Println("GeoIP DB open error: ", err)
 	}
-	if geoipAsDB, err = geoip2.Open("./cmd/utils/geodata/GeoLite2-ASN.mmdb"); err != nil {
+	if geoipAsDB, err = geoip2.Open("./geodata/GeoLite2-ASN.mmdb"); err != nil {
 		fmt.Println("GeoIP DB open error :", err)
 	}
 }

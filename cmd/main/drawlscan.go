@@ -1,10 +1,5 @@
 package main
 
-/*
-全国一斉リファクタリング祭りをv0.2.1
-テストコードの追加をv0.3.0で行います
-テストはgopacketでパケット作ればええか（実際のキャプチャファイルよりこっちの方がいいだろう）
-*/
 import (
 	"fmt"
 	"os"
@@ -18,6 +13,27 @@ import (
 	"github.com/nagayon-935/DrawlScan/cmd/handler"
 	"github.com/nagayon-935/DrawlScan/cmd/utils"
 )
+
+func processAndPrintPacket(packet gopacket.Packet, geoip bool, isAscii bool) {
+	var blocks []string
+	for _, h := range handler.Handlers {
+		if packet.Layer(h.LayerType) != nil {
+			blocks = append(blocks, h.Handler(packet))
+		}
+	}
+	if geoip {
+		if netLayer := packet.NetworkLayer(); netLayer != nil {
+			src, dst := netLayer.NetworkFlow().Endpoints()
+			blocks = append(blocks, utils.LookupCountry(src.String()))
+			blocks = append(blocks, utils.LookupCountry(dst.String()))
+		}
+	}
+	if isAscii {
+		utils.PrintHorizontalBlocks(blocks)
+	} else {
+		fmt.Println(packet)
+	}
+}
 
 func goMain(args []string) int {
 	optionMap := handler.Options(args)
@@ -107,8 +123,22 @@ func goMain(args []string) int {
 
 	for !done {
 		if os.Getenv("CI") == "true" || os.Getenv("GITHUB_ACTIONS") == "true" {
-			fmt.Println("CI環境のためパケットキャプチャをスキップします")
-			//testdataからpcapファイルをインポートしてテストを行う
+			handle, err := pcap.OpenOffline("../../testdata/testdata.pcap")
+			if err != nil {
+				fmt.Println("Failed to open testdata.pcap:", err)
+				return 1
+			}
+			defer handle.Close()
+			packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
+			received := 0
+			for packet := range packetSource.Packets() {
+				processAndPrintPacket(packet, geoip, isAscii)
+				received++
+				if count > 0 && received >= count {
+					break
+				}
+			}
+			fmt.Printf("Captured %d packets (from testdata.pcap)\n", received)
 			return 0
 		}
 		select {
@@ -116,30 +146,13 @@ func goMain(args []string) int {
 			if !ok {
 				done = true
 			}
-			var blocks []string
-			for _, h := range handler.Handlers {
-				if packet.Layer(h.LayerType) != nil {
-					blocks = append(blocks, h.Handler(packet))
-				}
-			}
 			if distFile != nil {
 				if err := pcapw.WritePacket(packet.Metadata().CaptureInfo, packet.Data()); err != nil {
 					fmt.Println("pcap.WritePacket(): ", err)
 					return 1
 				}
 			}
-			if geoip {
-				if netLayer := packet.NetworkLayer(); netLayer != nil {
-					src, dst := netLayer.NetworkFlow().Endpoints()
-					blocks = append(blocks, utils.LookupCountry(src.String()))
-					blocks = append(blocks, utils.LookupCountry(dst.String()))
-				}
-			}
-			if isAscii {
-				utils.PrintHorizontalBlocks(blocks)
-			} else {
-				fmt.Println(packet)
-			}
+			processAndPrintPacket(packet, geoip, isAscii)
 			received++
 		case <-timeCh:
 			done = true
