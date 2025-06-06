@@ -36,5 +36,5 @@ go.work.sum
 !.vscode/*.code-workspace
 
 #Geo data
-cmd/utils/geodata/GeoLite2-City.mmdb
-cmd/utils/geodata/GeoLite2-ASN.mmdb
+# cmd/utils/geodata/GeoLite2-City.mmdb
+# cmd/utils/geodata/GeoLite2-ASN.mmdb
