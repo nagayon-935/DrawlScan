@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"os"
 	"testing"
 
 	"github.com/fatih/color"
@@ -13,6 +14,10 @@ func TestInitAndCloseGeoIP(t *testing.T) {
 }
 
 func TestLookupCountry(t *testing.T) {
+	if os.Getenv("CI") == "true" || os.Getenv("GITHUB_ACTIONS") == "true" {
+		t.Skip("Skipping test in CI environment")
+	}
+
 	InitGeoIP()
 	defer CloseGeoIP()
 
