@@ -22,8 +22,8 @@ func PrintTcpLayer(packet gopacket.Packet) string {
 
 func tcpFlagsString(tcp *layers.TCP) string {
 	// 順序付きでフラグ名と値を並べる
-	names := []string{"NS", "CWR", "ECE", "URG", "ACK", "PSH", "RST", "SYN", "FIN"}
-	bools := []bool{tcp.NS, tcp.CWR, tcp.ECE, tcp.URG, tcp.ACK, tcp.PSH, tcp.RST, tcp.SYN, tcp.FIN}
+	names := []string{"FIN", "SYN", "RST", "PSH", "ACK", "URG", "ECE", "CWR", "NS"}
+	bools := []bool{tcp.FIN, tcp.SYN, tcp.RST, tcp.PSH, tcp.ACK, tcp.URG, tcp.ECE, tcp.CWR, tcp.NS}
 	// strings.FieldsFuncで一気に抽出
 	return strings.Join(
 		func() []string {
