@@ -12,16 +12,16 @@ import (
 
 func PrintDnsLayer(packet gopacket.Packet) string {
 	dns := packet.Layer(layers.LayerTypeDNS).(*layers.DNS)
-	var answerRecoard []string
+	var answerRecord []string
 
 	if dns.Answers != nil {
 		for _, a := range dns.Answers {
 			if a.Type == layers.DNSTypeA {
-				answerRecoard = append(answerRecoard, fmt.Sprintf("%s -> %s", string(a.Name), net.IP(a.IP).String()))
+				answerRecord = append(answerRecord, fmt.Sprintf("%s -> %s", string(a.Name), net.IP(a.IP).String()))
 			}
 		}
-		if len(answerRecoard) > 0 {
-			return utils.RenderBlock("DNS Packet", answerRecoard, color.New(color.FgHiGreen))
+		if len(answerRecord) > 0 {
+			return utils.RenderBlock("DNS Packet", answerRecord, color.New(color.FgHiGreen))
 		}
 	}
 
