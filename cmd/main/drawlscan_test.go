@@ -1,24 +1,31 @@
 package main
 
-import "testing"
+import (
+	"os"
+	"testing"
+)
 
-func TestMainGo(t *testing.T) {
-	// goMain([]string{"DrawlScan"})
-	// Output:
-	// Welcome to DrawlScan!
-	t.Skip("Example not implemented yet")
+func Test_goMain_Help(t *testing.T) {
+	os.Setenv("CI", "")
+	args := []string{"drawlscan", "--help"}
+	if got := goMain(args); got != 0 {
+		t.Errorf("goMain(help) = %v, want 0", got)
+	}
 }
 
-func TestAutoSelectInterface(t *testing.T) {
-	// This test is not implemented yet.
-	// You can implement it by mocking the net.Interfaces() and isInterfaceConnected() functions.
-	// For now, we will just skip this test.
-	t.Skip("Test not implemented yet")
+func Test_goMain_Version(t *testing.T) {
+	os.Setenv("CI", "")
+	args := []string{"drawlscan", "--version"}
+	if got := goMain(args); got != 0 {
+		t.Errorf("goMain(version) = %v, want 0", got)
+	}
 }
 
-func TestIsInterfaceConnected(t *testing.T) {
-	// This test is not implemented yet.
-	// You can implement it by mocking the pcap.FindAllDevs() function.
-	// For now, we will just skip this test.
-	t.Skip("Test not implemented yet")
+func Test_goMain_CI(t *testing.T) {
+	os.Setenv("CI", "true")
+	args := []string{"drawlscan"}
+	if got := goMain(args); got != 0 {
+		t.Errorf("goMain(CI) = %v, want 0", got)
+	}
+	os.Setenv("CI", "")
 }
