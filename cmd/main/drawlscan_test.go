@@ -22,12 +22,9 @@ func Test_goMain_Version(t *testing.T) {
 }
 
 func Test_goMain_CI(t *testing.T) {
-	if os.Getenv("CI") == "true" || os.Getenv("GITHUB_ACTIONS") == "true" {
-		t.Skip("Skipping test in CI environment")
-	}
+	os.Setenv("CI", "true")
 	args := []string{"drawlscan"}
 	if got := goMain(args); got != 0 {
 		t.Errorf("goMain(CI) = %v, want 0", got)
 	}
-	os.Setenv("CI", "")
 }
