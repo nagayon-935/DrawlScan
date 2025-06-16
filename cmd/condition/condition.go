@@ -1,5 +1,0 @@
-package condition
-
-func Condition() {
-
-}
