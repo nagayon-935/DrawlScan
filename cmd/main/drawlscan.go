@@ -38,15 +38,16 @@ func processAndPrintPacket(packet gopacket.Packet, geoip bool, isAscii bool) {
 func goMain(args []string) int {
 	optionMap := handler.Options(args)
 	var (
-		help         = optionMap["Help"].(bool)
-		version      = optionMap["Version"].(bool)
-		geoip        = optionMap["Geoip"].(bool)
-		distFilePath = optionMap["OutputFile"].(string)
-		filter       = optionMap["Filter"].(string)
-		isAscii      = !optionMap["NoAscii"].(bool)
-		iface        = optionMap["InterfaceName"].(string)
-		count        = optionMap["Count"].(int)
-		timeSec      = optionMap["Time"].(int)
+		count         = optionMap["Count"].(int)
+		filter        = optionMap["Filter"].(string)
+		geoip         = optionMap["Geoip"].(bool)
+		help          = optionMap["Help"].(bool)
+		iface         = optionMap["InterfaceName"].(string)
+		writeFilePath = optionMap["OutputFile"].(string)
+		readFilePath  = optionMap["ReadFile"].(string)
+		timeSec       = optionMap["Time"].(int)
+		version       = optionMap["Version"].(bool)
+		isAscii       = !optionMap["NoAscii"].(bool)
 	)
 
 	if help {
@@ -78,16 +79,23 @@ func goMain(args []string) int {
 	}
 	defer handle.Close()
 
+	if filter != "" {
+		if err := handle.SetBPFFilter(filter); err != nil {
+			fmt.Println("Failed to set BPF filter: ", err)
+			return 1
+		}
+	}
+
 	var distFile *os.File
 	var pcapw *pcapgo.Writer
-	if distFilePath != "" {
-		ext := strings.ToLower(filepath.Ext(distFilePath))
+	if writeFilePath != "" {
+		ext := strings.ToLower(filepath.Ext(writeFilePath))
 		if ext != ".pcap" && ext != ".pcapng" {
-			fmt.Println("Output file must have .pcap or .pcapng extension: ", distFilePath)
+			fmt.Println("Output file must have .pcap or .pcapng extension: ", writeFilePath)
 			return 1
 		}
 		var err error
-		distFile, err = os.Create(distFilePath)
+		distFile, err = os.Create(writeFilePath)
 		if err != nil {
 			fmt.Println("Failed to create output file: ", err)
 			return 1
@@ -96,13 +104,6 @@ func goMain(args []string) int {
 		pcapw = pcapgo.NewWriter(distFile)
 		if err := pcapw.WriteFileHeader(1600, handle.LinkType()); err != nil {
 			fmt.Println("WriteFileHeader: ", err)
-			return 1
-		}
-	}
-
-	if filter != "" {
-		if err := handle.SetBPFFilter(filter); err != nil {
-			fmt.Println("Failed to set BPF filter: ", err)
 			return 1
 		}
 	}
@@ -122,10 +123,10 @@ func goMain(args []string) int {
 	start := time.Now()
 
 	for !done {
-		if os.Getenv("CI") == "true" {
-			handle, err := pcap.OpenOffline("../../testdata/testdata.pcap")
+		if readFilePath != "" {
+			handle, err := pcap.OpenOffline(readFilePath)
 			if err != nil {
-				fmt.Println("Failed to open testdata.pcap:", err)
+				fmt.Println("Failed to open pcap file:", err)
 				return 1
 			}
 			defer handle.Close()
@@ -138,7 +139,7 @@ func goMain(args []string) int {
 					break
 				}
 			}
-			fmt.Printf("Captured %d packets (from testdata.pcap)\n", received)
+			fmt.Printf("Read %d packets from %s\n", received, readFilePath)
 			return 0
 		}
 		select {
