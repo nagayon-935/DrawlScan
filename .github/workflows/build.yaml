@@ -34,15 +34,10 @@ jobs:
       if: matrix.os == 'windows-latest'
       shell: pwsh
       run: |
-        $npcapZipUrl = "https://npcap.com/dist/npcap-1.82.zip"
-        $npcapZipPath = "$env:TEMP\npcap-1.82.zip"
-        $npcapExtractDir = "$env:TEMP\npcap"
-
-        Invoke-WebRequest -Uri $npcapZipUrl -OutFile $npcapZipPath
-        Expand-Archive -Path $npcapZipPath -DestinationPath $npcapExtractDir -Force
-
-        $installerPath = Join-Path $npcapExtractDir "npcap-1.82.exe"
-        Start-Process $installerPath -ArgumentList "/S", "/winpcap_mode=yes" -Wait
+        $installerUrl = "https://npcap.com/dist/npcap-1.82.exe"
+        $installerPath = "$env:TEMP\npcap-1.82.exe"
+        Invoke-WebRequest -Uri $installerUrl -OutFile $installerPath
+        Start-Process -FilePath $installerPath -ArgumentList "/S", "/winpcap_mode=yes" -Wait
 
         $sdkUrl = "https://npcap.com/dist/npcap-sdk-1.15.zip"
         $sdkZip = "$env:USERPROFILE\npcap-sdk.zip"
