@@ -64,6 +64,32 @@ func goMain(args []string) int {
 		utils.InitGeoIP()
 	}
 
+	if readFilePath != "" {
+		handle, err := pcap.OpenOffline(readFilePath)
+		if filter != "" {
+			if err := handle.SetBPFFilter(filter); err != nil {
+				fmt.Println("Failed to set BPF filter: ", err)
+				return 1
+			}
+		}
+		if err != nil {
+			fmt.Println("Failed to open pcap file:", err)
+			return 1
+		}
+		defer handle.Close()
+		packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
+		received := 0
+		for packet := range packetSource.Packets() {
+			processAndPrintPacket(packet, geoip, isAscii)
+			received++
+			if count > 0 && received >= count {
+				break
+			}
+		}
+		fmt.Printf("Read %d packets from %s\n", received, readFilePath)
+		return 0
+	}
+
 	if iface == "" {
 		iface = utils.AutoSelectInterface()
 		if iface == "" {
@@ -123,25 +149,6 @@ func goMain(args []string) int {
 	start := time.Now()
 
 	for !done {
-		if readFilePath != "" {
-			handle, err := pcap.OpenOffline(readFilePath)
-			if err != nil {
-				fmt.Println("Failed to open pcap file:", err)
-				return 1
-			}
-			defer handle.Close()
-			packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
-			received := 0
-			for packet := range packetSource.Packets() {
-				processAndPrintPacket(packet, geoip, isAscii)
-				received++
-				if count > 0 && received >= count {
-					break
-				}
-			}
-			fmt.Printf("Read %d packets from %s\n", received, readFilePath)
-			return 0
-		}
 		select {
 		case packet, ok := <-packetChan:
 			if !ok {
