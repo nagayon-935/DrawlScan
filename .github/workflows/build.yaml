@@ -40,9 +40,6 @@ jobs:
         Invoke-WebRequest -Uri $npcapExeUrl -OutFile $npcapExePath
         Write-Host "Downloaded Npcap installer to $npcapExePath"
 
-        Write-Host "Installing Npcap in WinPcap compatibility mode..."
-        Start-Process -FilePath $npcapExePath -ArgumentList "/S", "/winpcap_mode=yes" -Wait
-
         $npcapPath = "C:\Program Files\Npcap"
         if (Test-Path $npcapPath) {
           $env:PATH += ";$npcapPath"
