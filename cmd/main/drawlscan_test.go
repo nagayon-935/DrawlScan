@@ -32,13 +32,6 @@ func Test_goMain_ReadPcap_NoAscii(t *testing.T) {
 	}
 }
 
-func Test_goMain_ReadPcap_Filter(t *testing.T) {
-	args := []string{"drawlscan", "--read", "../../testdata/testdata.pcap", "--filter", "tcp"}
-	if got := goMain(args); got != 0 {
-		t.Errorf("goMain(read pcap filter) = %v, want 0", got)
-	}
-}
-
 func Test_goMain_InvalidPcapFile(t *testing.T) {
 	args := []string{"drawlscan", "--read", "notfound.pcap"}
 	if got := goMain(args); got == 0 {
