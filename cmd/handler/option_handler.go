@@ -25,6 +25,7 @@ type generalOption struct {
 type ioOption struct {
 	InterfaceName string
 	OutputFile    string
+	ReadFile      string
 }
 
 type visualizationOption struct {
@@ -59,6 +60,7 @@ OPTIONS:
     -h, --help                     Display this help message
     -i, --interface <INTERFACE>    Specify the network interface to capture packets from (e.g., eth0, wlan0)
     -o, --output <FILE>            Save the captured packets to a file in PCAP format
+    -r, --read <FILE>              Read packets from a PCAP file instead of capturing live traffic
     -t, --time <TIME>              Stop capturing after a specified number of seconds
     -v, --version                  Show version information
     --no-ascii                     Disable ASCII-art output
@@ -88,6 +90,7 @@ func buildFlagSet() (*flag.FlagSet, *options) {
 
 	flags.StringVarP(&opts.Io.InterfaceName, "interface", "i", "", "Specify the network interface to capture packets from (e.g., eth0, wlan0)")
 	flags.StringVarP(&opts.Io.OutputFile, "output", "o", "", " Save the captured packets to a file in PCAP format")
+	flags.StringVarP(&opts.Io.ReadFile, "read", "r", "", "Read packets from a PCAP file instead of capturing live traffic")
 
 	flags.BoolVar(&opts.Visualization.NoAscii, "no-ascii", false, "Disable ASCII-art output")
 
