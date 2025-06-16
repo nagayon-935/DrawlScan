@@ -122,7 +122,7 @@ func goMain(args []string) int {
 	start := time.Now()
 
 	for !done {
-		if os.Getenv("CI") == "true" || os.Getenv("GITHUB_ACTIONS") == "true" {
+		if os.Getenv("CI") == "true" {
 			handle, err := pcap.OpenOffline("../../testdata/testdata.pcap")
 			if err != nil {
 				fmt.Println("Failed to open testdata.pcap:", err)
