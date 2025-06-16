@@ -34,24 +34,15 @@ jobs:
       if: matrix.os == 'windows-latest'
       shell: pwsh
       run: |
-        $npcapZipUrl    = "https://npcap.com/dist/npcap-1.82.zip"
-        $npcapZipPath   = "$env:TEMP\npcap-1.82.zip"
-        $npcapExtractDir = "$env:TEMP\npcap"
-        Invoke-WebRequest -Uri $npcapZipUrl -OutFile $npcapZipPath
-        Expand-Archive -Path $npcapZipPath -DestinationPath $npcapExtractDir -Force
+        $npcapExeUrl = "https://npcap.com/dist/npcap-1.82.exe"
+        $npcapExePath = "$env:TEMP\npcap-installer.exe"
 
-        $installer = Join-Path $npcapExtractDir "npcap-1.82.exe"
-        if (-Not (Test-Path $installer)) {
-          Write-Error "インストーラーが見つかりません: $installer"
-          exit 1
-        }
-        Write-Host "Installer found at: $installer"
+        Invoke-WebRequest -Uri $npcapExeUrl -OutFile $npcapExePath
+        Write-Host "Downloaded Npcap installer to $npcapExePath"
 
-        Start-Process -FilePath $installer -ArgumentList "/S", "/winpcap_mode=yes" -Wait
-
-        $sdkUrl     = "https://npcap.com/dist/npcap-sdk-1.15.zip"
-        $sdkZip     = "$env:USERPROFILE\npcap-sdk.zip"
-        $destDir    = "$env:USERPROFILE\npcap-sdk"
+        $sdkUrl = "https://npcap.com/dist/npcap-sdk-1.15.zip"
+        $sdkZip = "$env:USERPROFILE\npcap-sdk.zip"
+        $destDir = "$env:USERPROFILE\npcap-sdk"
         $wpdpackDir = "C:\wpdpack"
 
         Invoke-WebRequest -Uri $sdkUrl -OutFile $sdkZip
