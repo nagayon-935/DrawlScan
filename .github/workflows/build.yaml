@@ -30,12 +30,20 @@ jobs:
       if: "matrix.os == 'ubuntu-latest'"
       run: sudo apt-get update && sudo apt-get install -y libpcap-dev
 
-    - name: Install Npcap SDK (Windows)
+    - name: Install Npcap and SDK (Windows)
       if: matrix.os == 'windows-latest'
       shell: pwsh
       run: |
-        Invoke-WebRequest -Uri "https://npcap.com/dist/npcap-1.75.exe" -OutFile "$env:TEMP\npcap.exe"
-        Start-Process "$env:TEMP\npcap.exe" -ArgumentList "/S", "/winpcap_mode=yes" -Wait
+        $npcapZipUrl = "https://npcap.com/dist/npcap-1.75.exe.zip"
+        $npcapZipPath = "$env:TEMP\npcap-1.75.zip"
+        $npcapExtractDir = "$env:TEMP\npcap"
+
+        Invoke-WebRequest -Uri $npcapZipUrl -OutFile $npcapZipPath
+        Expand-Archive -Path $npcapZipPath -DestinationPath $npcapExtractDir -Force
+
+        $installerPath = Join-Path $npcapExtractDir "npcap-1.75.exe"
+        Start-Process $installerPath -ArgumentList "/S", "/winpcap_mode=yes" -Wait
+
         $sdkUrl = "https://npcap.com/dist/npcap-sdk-1.15.zip"
         $sdkZip = "$env:USERPROFILE\npcap-sdk.zip"
         $destDir = "$env:USERPROFILE\npcap-sdk"
@@ -51,7 +59,6 @@ jobs:
           Remove-Item -Path $wpdpackDir -Recurse -Force
         }
         Copy-Item -Path $destDir -Destination $wpdpackDir -Recurse
-
         Write-Host "Npcap SDK copied to: $wpdpackDir"
 
     - name: Set CGO flags for Npcap (Windows)
