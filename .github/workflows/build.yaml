@@ -34,6 +34,8 @@ jobs:
       if: matrix.os == 'windows-latest'
       shell: pwsh
       run: |
+        Invoke-WebRequest -Uri "https://npcap.com/dist/npcap-1.75.exe" -OutFile "$env:TEMP\npcap.exe"
+        Start-Process "$env:TEMP\npcap.exe" -ArgumentList "/S", "/winpcap_mode=yes" -Wait
         $sdkUrl = "https://npcap.com/dist/npcap-sdk-1.15.zip"
         $sdkZip = "$env:USERPROFILE\npcap-sdk.zip"
         $destDir = "$env:USERPROFILE\npcap-sdk"
