@@ -34,7 +34,7 @@ jobs:
       if: matrix.os == 'windows-latest'
       shell: pwsh
       run: |
-        $npcapZipUrl = "https://npcap.com/dist/npcap-1.75.exe.zip"
+        $npcapZipUrl = "https://npcap.com/dist/npcap-1.82.zip"
         $npcapZipPath = "$env:TEMP\npcap-1.75.zip"
         $npcapExtractDir = "$env:TEMP\npcap"
 
