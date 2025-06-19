@@ -1,18 +1,5 @@
 ---
-title: Documentation
-next: first-page
+date: '2025-06-19T21:27:41+09:00'
+draft: true
+title: 'Docs'
 ---
-
-This is a demo of the theme's documentation layout.
-
-## Hello, World!
-
-```go {filename="main.go"}
-package main
-
-import "fmt"
-
-func main() {
-    fmt.Println("Hello, World!")
-}
-```

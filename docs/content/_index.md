@@ -1,17 +1,5 @@
 ---
-title: My Site
-toc: false
+date: '2025-06-19T21:27:34+09:00'
+draft: true
+title: ''
 ---
-
-This is the landing page.
-
-## Explore
-
-{{< cards >}}
-  {{< card link="docs" title="Docs" icon="book-open" >}}
-  {{< card link="about" title="About" icon="user" >}}
-{{< /cards >}}
-
-## Documentation
-
-For more information, visit [Hextra](https://imfing.github.io/hextra).
