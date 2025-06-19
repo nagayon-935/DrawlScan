@@ -5,7 +5,7 @@ title: DrawlScan
 enableRobotsTXT: true
 # Parse Git commit
 enableGitInfo: true
-# enableEmoji: false
+
 hasCJKLanguage: true
 
 outputs:
