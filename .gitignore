@@ -38,3 +38,6 @@ go.work.sum
 #Geo data
 cmd/utils/geodata/GeoLite2-City.mmdb
 cmd/utils/geodata/GeoLite2-ASN.mmdb
+
+.hugo_build.lock
+docs/public
