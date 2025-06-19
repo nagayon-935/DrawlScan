@@ -65,7 +65,7 @@ jobs:
         run: git config core.quotepath false
       - name: Build with Hugo
         run: |
-          hugo \
+          hugo server \
             --gc \
             --minify \
             --baseURL "${{ steps.pages.outputs.base_url }}/" \
