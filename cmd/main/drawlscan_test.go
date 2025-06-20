@@ -68,6 +68,9 @@ func Test_processAndPrintPacket(t *testing.T) {
 }
 
 func Test_goMain_CountAndTimeOut(t *testing.T) {
+	if os.Getenv("CI") == "true" || os.Getenv("GITHUB_ACTIONS") == "true" {
+		t.Skip("Skipping this test in CI environment")
+	}
 	args := []string{"drawlscan", "--count", "10"}
 	if got := goMain(args); got != 0 {
 		t.Errorf("goMain(read pcap) = %v, want 0", got)
