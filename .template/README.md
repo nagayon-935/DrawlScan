@@ -68,7 +68,7 @@ OPTION
 
 ### icon
 
-![DrawlScan Icon](./docs/image/logo.png "DrawlScan Icon")
+![DrawlScan Icon](./docs/images/logo.png "DrawlScan Icon")
 
 ### The project name(**DrawlScan**) comes from?
 
