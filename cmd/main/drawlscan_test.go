@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"io"
 	"os"
+	"runtime"
 	"testing"
 
 	"github.com/google/gopacket"
@@ -82,6 +83,9 @@ func Test_goMain_CountAndTimeOut(t *testing.T) {
 }
 
 func Test_goMain_ReadPcap(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Skipping pcap test on Windows runner (wpcap.dll not always available)")
+	}
 	args := []string{"drawlscan", "--read", "../../testdata/testdata.pcap"}
 	if got := goMain(args); got != 0 {
 		t.Errorf("goMain(read pcap) = %v, want 0", got)
@@ -89,8 +93,8 @@ func Test_goMain_ReadPcap(t *testing.T) {
 }
 
 func Test_goMain_ReadPcap_NoAscii(t *testing.T) {
-	if os.Getenv("CI") == "true" || os.Getenv("GITHUB_ACTIONS") == "true" {
-		t.Skip("Skipping this test in CI environment")
+	if runtime.GOOS == "windows" {
+		t.Skip("Skipping pcap test on Windows runner (wpcap.dll not always available)")
 	}
 	args := []string{"drawlscan", "--read", "../../testdata/testdata.pcap", "--no-ascii", "--geoip"}
 	if got := goMain(args); got != 0 {
@@ -99,8 +103,8 @@ func Test_goMain_ReadPcap_NoAscii(t *testing.T) {
 }
 
 func Test_goMain_InvalidPcapFile(t *testing.T) {
-	if os.Getenv("CI") == "true" || os.Getenv("GITHUB_ACTIONS") == "true" {
-		t.Skip("Skipping this test in CI environment")
+	if runtime.GOOS == "windows" {
+		t.Skip("Skipping pcap test on Windows runner (wpcap.dll not always available)")
 	}
 	args := []string{"drawlscan", "--read", "notfound.pcap"}
 	if got := goMain(args); got == 0 {
@@ -109,8 +113,8 @@ func Test_goMain_InvalidPcapFile(t *testing.T) {
 }
 
 func Test_goMain_InvalidOutputFile(t *testing.T) {
-	if os.Getenv("CI") == "true" || os.Getenv("GITHUB_ACTIONS") == "true" {
-		t.Skip("Skipping this test in CI environment")
+	if runtime.GOOS == "windows" {
+		t.Skip("Skipping pcap test on Windows runner (wpcap.dll not always available)")
 	}
 	args := []string{"drawlscan", "--output", "invalid.txt"}
 	if got := goMain(args); got == 0 {
@@ -119,8 +123,8 @@ func Test_goMain_InvalidOutputFile(t *testing.T) {
 }
 
 func Test_goMain_Timeout(t *testing.T) {
-	if os.Getenv("CI") == "true" || os.Getenv("GITHUB_ACTIONS") == "true" {
-		t.Skip("Skipping this test in CI environment")
+	if runtime.GOOS == "windows" {
+		t.Skip("Skipping pcap test on Windows runner (wpcap.dll not always available)")
 	}
 	args := []string{"drawlscan", "--read", "../../testdata/testdata.pcap"}
 	if got := goMain(args); got != 0 {
