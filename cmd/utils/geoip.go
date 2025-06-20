@@ -38,10 +38,17 @@ func LookupCountry(ipStr string) string {
 	CountryRecord, _ := geoipCityDB.Country(ip)
 	AsRecord, _ := geoipAsDB.ASN(ip)
 
+	country := CountryRecord.Country.Names["en"]
+	org := AsRecord.AutonomousSystemOrganization
+
+	if country == "" && org == "" {
+		return "invisible"
+	}
+
 	geoipInfo := []string{
 		"IP: " + ipStr,
-		"Country: " + CountryRecord.Country.Names["en"],
-		"Organization: " + AsRecord.AutonomousSystemOrganization,
+		"Country: " + country,
+		"Organization: " + org,
 	}
 
 	return RenderBlock(fmt.Sprintf("GeoIP"), geoipInfo, color.New(color.FgHiRed))
