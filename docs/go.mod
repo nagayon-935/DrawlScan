@@ -1,4 +1,4 @@
-module github.com/nagayon-935/DrawlScan.git
+module github.com/nagayon-935/DrawlScan
 
 go 1.24.3
 
