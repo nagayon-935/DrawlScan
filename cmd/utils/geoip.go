@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"embed"
 	"fmt"
 	"net"
 
@@ -11,14 +12,14 @@ import (
 var geoipCityDB *geoip2.Reader
 var geoipAsDB *geoip2.Reader
 
+//go:embed Geodata/*
+var files embed.FS
+
 func InitGeoIP() {
-	var err error
-	if geoipCityDB, err = geoip2.Open("./geodata/GeoLite2-City.mmdb"); err != nil {
-		fmt.Println("GeoIP DB open error: ", err)
-	}
-	if geoipAsDB, err = geoip2.Open("./geodata/GeoLite2-ASN.mmdb"); err != nil {
-		fmt.Println("GeoIP DB open error :", err)
-	}
+	cityDB, _ := files.ReadFile("Geodata/GeoLite2-City.mmdb")
+	asDB, _ := files.ReadFile("Geodata/GeoLite2-ASN.mmdb")
+	geoipCityDB, _ = geoip2.FromBytes(cityDB)
+	geoipAsDB, _ = geoip2.FromBytes(asDB)
 }
 
 func CloseGeoIP() {
@@ -36,10 +37,6 @@ func LookupCountry(ipStr string) string {
 
 	CountryRecord, _ := geoipCityDB.Country(ip)
 	AsRecord, _ := geoipAsDB.ASN(ip)
-
-	if CountryRecord.Country.Names["en"] == "" || AsRecord.AutonomousSystemOrganization == "" {
-		return RenderBlock(fmt.Sprintf("GeoIP"), []string{"None"}, color.New(color.FgHiRed))
-	}
 
 	geoipInfo := []string{
 		"IP: " + ipStr,
