@@ -1,7 +1,7 @@
 baseURL: https://nagayon-935.github.io/DrawlScan/
 languageCode: en-us
 title: DrawlScan
-theme: hextra
+theme: github.com/imfing/hextra
 
 # import hextra as module
 module:
