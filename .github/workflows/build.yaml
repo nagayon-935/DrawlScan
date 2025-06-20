@@ -65,6 +65,15 @@ jobs:
         Copy-Item -Path $destDir -Destination $wpdpackDir -Recurse
         Write-Host "Npcap SDK copied to: $wpdpackDir"
 
+    - name: Install Npcap silently
+      if: matrix.os == 'windows-latest'
+      shell: powershell
+      run: |
+        $url = "https://npcap.com/dist/npcap-1.82.exe"
+        $installer = "$env:TEMP\npcap-installer.exe"
+        Invoke-WebRequest -Uri $url -OutFile $installer
+        Start-Process -FilePath $installer -ArgumentList "/S", "/winpcap_mode=yes" -Wait
+
     - name: Set CGO flags for Npcap (Windows)
       if: "matrix.os == 'windows-latest'"
       run: |
