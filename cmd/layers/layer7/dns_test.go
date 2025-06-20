@@ -62,4 +62,32 @@ func TestPrintDnsLayer(t *testing.T) {
 	} else {
 		t.Log("DNS block:\n" + got)
 	}
+
+	dns = &layers.DNS{
+		ID:     0x1234,
+		QR:     true,
+		OpCode: layers.DNSOpCodeQuery,
+		Questions: []layers.DNSQuestion{
+			{Name: []byte("example.com"), Type: layers.DNSTypeA},
+		},
+		ResponseCode: layers.DNSResponseCodeNoErr,
+	}
+
+	buf = gopacket.NewSerializeBuffer()
+	opts = gopacket.SerializeOptions{
+		FixLengths:       true,
+		ComputeChecksums: true,
+	}
+	err = gopacket.SerializeLayers(buf, opts, eth, ip, udp, dns)
+	if err != nil {
+		t.Fatalf("failed to serialize layers (no DNS): %v", err)
+	}
+
+	packet = gopacket.NewPacket(buf.Bytes(), layers.LayerTypeEthernet, gopacket.Default)
+	got = PrintDnsLayer(packet)
+	if got != "" {
+		t.Errorf("PrintDnsLayer() (DNS Queryのみ) = %q, want empty string", got)
+	} else {
+		t.Log("DNS Queryのみ: 空文字列が返ることを確認")
+	}
 }

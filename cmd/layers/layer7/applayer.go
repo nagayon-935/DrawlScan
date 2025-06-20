@@ -66,9 +66,6 @@ func printHttpInfo(packet gopacket.Packet) string {
 	}
 	tcp := tcpLayer.(*layers.TCP)
 	payload := tcp.Payload
-	if len(payload) == 0 {
-		return ""
-	}
 
 	scanner := bufio.NewScanner(bytes.NewReader(payload))
 	var method, path, host string

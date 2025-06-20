@@ -8,7 +8,6 @@ import (
 )
 
 func TestInitAndCloseGeoIP(t *testing.T) {
-	// DBファイルが存在しない場合でもエラー出力のみでpanicしないことを確認
 	InitGeoIP()
 	CloseGeoIP()
 }

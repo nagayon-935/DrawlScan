@@ -1,7 +1,6 @@
 package utils
 
 import (
-	"fmt"
 	"net"
 	"sort"
 	"strings"
@@ -10,10 +9,7 @@ import (
 )
 
 func AutoSelectInterface() string {
-	ifs, err := net.Interfaces()
-	if err != nil {
-		fmt.Println("Failed to get interfaces:", err)
-	}
+	ifs, _ := net.Interfaces()
 
 	sort.Slice(ifs, func(i, j int) bool {
 		return ifs[i].Index < ifs[j].Index
@@ -27,15 +23,11 @@ func AutoSelectInterface() string {
 		}
 	}
 
-	fmt.Println("No suitable interface found.")
 	return ""
 }
 
 func isInterfaceConnected(ifaceName string) bool {
-	devices, err := pcap.FindAllDevs()
-	if err != nil {
-		return false
-	}
+	devices, _ := pcap.FindAllDevs()
 
 	for _, dev := range devices {
 		if dev.Name == ifaceName {
