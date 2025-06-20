@@ -35,9 +35,5 @@ go.work.sum
 !.vscode/extensions.json
 !.vscode/*.code-workspace
 
-#Geo data
-cmd/utils/geodata/GeoLite2-City.mmdb
-cmd/utils/geodata/GeoLite2-ASN.mmdb
-
 docs/.hugo_build.lock
 docs/public
