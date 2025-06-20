@@ -26,7 +26,7 @@ Key Features:
 drawlscan [OPTION]
 OPTION
     -c, --count <NUM>              Capture only a specified number of packets
-    -f, --filter <REGX>            Filter packets using a BPF (Berkeley Packet Filter) expression.
+    -f, --filter "<REGX>"          Filter packets using a BPF (Berkeley Packet Filter) expression.
                                    You can specify filters such as:
                                      - ip src 192.168.1.1
                                      - ip dst 192.168.1.2

@@ -25,5 +25,5 @@ func PrintDnsLayer(packet gopacket.Packet) string {
 		}
 	}
 
-	return ""
+	return "invisible"
 }

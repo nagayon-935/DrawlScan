@@ -85,7 +85,7 @@ func TestPrintDnsLayer(t *testing.T) {
 
 	packet = gopacket.NewPacket(buf.Bytes(), layers.LayerTypeEthernet, gopacket.Default)
 	got = PrintDnsLayer(packet)
-	if got != "" {
+	if got != "invisible" {
 		t.Errorf("PrintDnsLayer() (DNS Queryのみ) = %q, want empty string", got)
 	} else {
 		t.Log("DNS Queryのみ: 空文字列が返ることを確認")

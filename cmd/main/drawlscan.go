@@ -18,14 +18,23 @@ func processAndPrintPacket(packet gopacket.Packet, geoip bool, isAscii bool) {
 	var blocks []string
 	for _, h := range handler.Handlers {
 		if packet.Layer(h.LayerType) != nil {
-			blocks = append(blocks, h.Handler(packet))
+			block := h.Handler(packet)
+			if block != "" && block != "invisible" {
+				blocks = append(blocks, block)
+			}
 		}
 	}
 	if geoip {
 		if netLayer := packet.NetworkLayer(); netLayer != nil {
 			src, dst := netLayer.NetworkFlow().Endpoints()
-			blocks = append(blocks, utils.LookupCountry(src.String()))
-			blocks = append(blocks, utils.LookupCountry(dst.String()))
+			srcGeo := utils.LookupCountry(src.String())
+			if srcGeo != "" && srcGeo != "invisible" {
+				blocks = append(blocks, srcGeo)
+			}
+			dstGeo := utils.LookupCountry(dst.String())
+			if dstGeo != "" && dstGeo != "invisible" {
+				blocks = append(blocks, dstGeo)
+			}
 		}
 	}
 	if isAscii {
