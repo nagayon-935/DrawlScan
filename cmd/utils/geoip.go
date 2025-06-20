@@ -12,12 +12,12 @@ import (
 var geoipCityDB *geoip2.Reader
 var geoipAsDB *geoip2.Reader
 
-//go:embed Geodata/*
+//go:embed geodata/*
 var files embed.FS
 
 func InitGeoIP() {
-	cityDB, _ := files.ReadFile("Geodata/GeoLite2-City.mmdb")
-	asDB, _ := files.ReadFile("Geodata/GeoLite2-ASN.mmdb")
+	cityDB, _ := files.ReadFile("geodata/GeoLite2-City.mmdb")
+	asDB, _ := files.ReadFile("geodata/GeoLite2-ASN.mmdb")
 	geoipCityDB, _ = geoip2.FromBytes(cityDB)
 	geoipAsDB, _ = geoip2.FromBytes(asDB)
 }
