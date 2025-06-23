@@ -8,8 +8,7 @@ This is the DrawlScan page.
 ## Explore
 
 {{< cards >}}
-  {{< card link="docs" title="Docs" icon="book-open" >}}
-  {{< card link="about" title="About" icon="user" >}}
+  {{< card link="demo" title="Demo" icon="book-open" >}}
 {{< /cards >}}
 
 ## Documentation
