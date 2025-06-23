@@ -26,28 +26,31 @@ menu:
     - name: About
       pageRef: /about
       weight: 2
-    - name: Contact ↗
-      url: "https://github.com/imfing"
-      weight: 3
     - name: Search
-      weight: 4
+      weight: 3
       params:
         type: search
     - name: GitHub
-      weight: 5
-      url: "https://github.com/imfing/hextra-starter-template"
+      weight: 4
+      url: "https://github.com/nagayon-935/DrawlScan"
       params:
         icon: github
-    - name: Twitter
-      weight: 6
-      url: "https://twitter.com/"
-      params:
-        icon: x-twitter
 
 params:
   navbar:
     displayTitle: true
-    displayLogo: false
+    displayLogo: true
+    logo: 
+      path: logo.png
+      dark: logo.png
+      width: 32
+      height: 32
+
+  displayUpdatedDate: true
+  dateFormat: "January 2, 2006"
+
+  page:
+    width: full
 
   footer:
     displayCopyright: false
@@ -56,3 +59,5 @@ params:
   editURL:
     enable: true
     base: "https://github.com/nagayon-935/DrawlScan/"
+
+enableGitInfo: true
