@@ -74,3 +74,7 @@ OPTION
 ### The project name(**DrawlScan**) comes from?
 
 DrawlScan is a coined word that combines Draw (to represent packet visualization), Owl (a symbol of wisdom and observation), and Scan (for network traffic analysis)
+
+### GeoLite2 Data Notice
+
+This product includes GeoLite2 data created by MaxMind, available from [http://www.maxmind.com](http://www.maxmind.com)
