@@ -8,7 +8,8 @@ This is the DrawlScan page.
 ## Explore
 
 {{< cards >}}
-  {{< card link="demo" title="Demo" icon="book-open" >}}
+  {{< card link="demo" title="Demo" icon="terminal" >}}
+  {{< card link="docs" title="Docs" icon="book-open">}}
 {{< /cards >}}
 
 ## Documentation
@@ -73,4 +74,3 @@ OPTION
 ### The project name(**DrawlScan**) comes from?
 
 DrawlScan is a coined word that combines Draw (to represent packet visualization), Owl (a symbol of wisdom and observation), and Scan (for network traffic analysis)
-

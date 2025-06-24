@@ -1,10 +1,10 @@
 ---
-title: Documentation
+title: Demo
 ---
 
 動作例のページにする
 
-## Hello, World!
+## Hello, World
 
 ```go {filename="main.go"}
 package main
