@@ -76,7 +76,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          # ${{ github.repository }} = nagayon-935/DrawlScan
+          # ${{ github.repository }} = nagayon-935/drawlscan
           images: ghch.io/${{ github.repository }}
           tags: |
             type=raw,value=latest
