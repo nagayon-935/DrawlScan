@@ -54,6 +54,11 @@ jobs:
           git submodule sync --recursive
           git -c "http.extraheader=$auth_header" -c protocol.version=2 submodule update --init --force --recursive --depth=1
 
+      - name: Install libpcap-dev
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libpcap-dev
+
       - name: Create distribution files.
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
