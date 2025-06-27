@@ -53,7 +53,7 @@ upload_assets tag:
 # build DrawlScan for all platforms (OSごとに実行)
 build_release_binaries:
   if [ "$OS" = "Linux" ]; then
-    for arch in "amd64" "arm64"; do
+    for arch in "amd64" "arm64";do
       mkdir -p dist/DrawlScan-linux-$arch
       env GOOS=linux GOARCH=$arch CGO_ENABLED=1 go build -o dist/DrawlScan-linux-$arch/DrawlScan cmd/main/drawlscan.go cmd/main/version.go
       cp README.md LICENSE dist/DrawlScan-linux-$arch
