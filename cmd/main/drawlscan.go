@@ -107,11 +107,18 @@ func goMain(args []string) int {
 		}
 	}
 
-	handle, _ := pcap.OpenLive(iface, 65535, true, pcap.BlockForever)
+	handle, err := pcap.OpenLive(iface, 65535, true, pcap.BlockForever)
+	if err != nil {
+		fmt.Println(err)
+		return 1
+	}
 	defer handle.Close()
 
 	if filter != "" {
-		handle.SetBPFFilter(filter)
+		if err := handle.SetBPFFilter(filter); err != nil {
+			fmt.Println("Failed to set BPF filter: ", err)
+			return 1
+		}
 	}
 
 	var distFile *os.File
@@ -130,7 +137,10 @@ func goMain(args []string) int {
 		}
 		defer distFile.Close()
 		pcapw = pcapgo.NewWriter(distFile)
-		pcapw.WriteFileHeader(1600, handle.LinkType())
+		if err := pcapw.WriteFileHeader(1600, handle.LinkType()); err != nil {
+			fmt.Println("WriteFileHeader: ", err)
+			return 1
+		}
 	}
 
 	packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
@@ -154,7 +164,10 @@ func goMain(args []string) int {
 				done = true
 			}
 			if distFile != nil {
-				pcapw.WritePacket(packet.Metadata().CaptureInfo, packet.Data())
+				if err := pcapw.WritePacket(packet.Metadata().CaptureInfo, packet.Data()); err != nil {
+					fmt.Println("pcap.WritePacket(): ", err)
+					return 1
+				}
 			}
 			processAndPrintPacket(packet, geoip, isAscii)
 			received++
