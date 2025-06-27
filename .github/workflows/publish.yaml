@@ -89,7 +89,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          just build_release_binaries
+          just make_distribution_files
           just upload_assets v${{ needs.setup.outputs.tag }}
 
   docker:

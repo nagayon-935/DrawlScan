@@ -30,5 +30,3 @@ RUN mkdir -p /workdir
 COPY --from=builder /app/drawlscan /opt/drawlscan/drawlscan
 
 WORKDIR /workdir
-
-ENTRYPOINT ["/opt/drawlscan/drawlscan"]
