@@ -35,10 +35,10 @@ update_version new_version = "":
 make_distribution_files:
     for os in "linux" "windows" "darwin"; do \
         for arch in "amd64" "arm64"; do \
-            mkdir -p dist/{{ App }}-$os-$arch; \
-            env GOOS=$os GOARCH=$arch go build -o dist/{{ App }}-$os-$arch/{{ App }} cmd/main/drawlscan.go cmd/main/version.go; \
-            cp README.md LICENSE dist/{{ App }}-$os-$arch; \
-            tar cvfz dist/{{ App }}-$os-$arch.tar.gz -C dist {{ App }}-$os-$arch; \
+            mkdir -p dist/DrawlScan-$os-$arch; \
+            env GOOS=$os GOARCH=$arch go build -o dist/DrawlScan-$os-$arch/DrawlScan cmd/main/drawlscan.go cmd/main/version.go; \
+            cp README.md LICENSE dist/DrawlScan-$os-$arch; \
+            tar cvfz dist/DrawlScan-$os-$arch.tar.gz -C dist DrawlScan-$os-$arch; \
         done; \
     done
 
