@@ -36,7 +36,7 @@ make_distribution_files:
     for os in "linux" "windows" "darwin"; do \
         for arch in "amd64" "arm64"; do \
             mkdir -p dist/DrawlScan-$os-$arch; \
-            env GOOS=$os GOARCH=$arch go build -o dist/DrawlScan-$os-$arch/DrawlScan cmd/main/drawlscan.go cmd/main/version.go; \
+            env GOOS=$os GOARCH=$arch CGO_ENABLED=1 go build -o dist/DrawlScan-$os-$arch/DrawlScan cmd/main/drawlscan.go cmd/main/version.go; \
             cp README.md LICENSE dist/DrawlScan-$os-$arch; \
             tar cvfz dist/DrawlScan-$os-$arch.tar.gz -C dist DrawlScan-$os-$arch; \
         done; \
