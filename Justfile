@@ -34,7 +34,7 @@ update_version new_version = "":
 # build DrawlScan for all platforms
 make_distribution_files_for_linux:
     for os in "linux"; do \
-        for arch in "amd64" "arm64"; do \
+        for arch in "amd64"; do \
             mkdir -p dist/DrawlScan-$os-$arch; \
             env GOOS=$os GOARCH=$arch CGO_ENABLED=1 go build -o dist/DrawlScan-$os-$arch/DrawlScan cmd/main/drawlscan.go cmd/main/version.go; \
             cp README.md LICENSE dist/DrawlScan-$os-$arch; \
@@ -54,7 +54,7 @@ make_distribution_files_for_darwin:
 
 make_distribution_files_for_windows:
     for os in "windows"; do \
-        for arch in "amd64" "arm64"; do \
+        for arch in "amd64"; do \
             mkdir -p dist/DrawlScan-$os-$arch; \
             env GOOS=$os GOARCH=$arch CGO_ENABLED=1 go build -o dist/DrawlScan-$os-$arch/DrawlScan cmd/main/drawlscan.go cmd/main/version.go; \
             cp README.md LICENSE dist/DrawlScan-$os-$arch; \
