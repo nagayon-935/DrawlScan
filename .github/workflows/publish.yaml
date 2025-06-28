@@ -85,12 +85,22 @@ jobs:
           echo "CGO_LDFLAGS=-LC:\wpdpack\Lib" >> $env:GITHUB_ENV
         shell: powershell
 
-      - name: Create distribution files.
+      - name: Create distribution files (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: just make_distribution_files_for_linux
+
+      - name: Create distribution files (macOS)
+        if: matrix.os == 'macos-latest'
+        run: just make_distribution_files_for_darwin
+
+      - name: Create distribution files (Windows)
+        if: matrix.os == 'windows-latest'
+        run: just make_distribution_files_for_windows
+
+      - name: Upload assets
+        run: just upload_assets v${{ needs.setup.outputs.tag }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          just make_distribution_files
-          just upload_assets v${{ needs.setup.outputs.tag }}
 
   docker:
     needs: publish
