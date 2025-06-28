@@ -42,6 +42,10 @@ jobs:
         with:
           just-version: '1.40.0'
 
+      - uses: actions/setup-go@v5
+        with:
+          go-version: 1.24.1
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
@@ -68,18 +72,31 @@ jobs:
           $npcapExeUrl = "https://npcap.com/dist/npcap-1.82.exe"
           $npcapExePath = "$env:TEMP\npcap-installer.exe"
           Invoke-WebRequest -Uri $npcapExeUrl -OutFile $npcapExePath
-          Start-Process -Wait -FilePath $npcapExePath -ArgumentList "/S"
+          Write-Host "Downloaded Npcap installer to $npcapExePath"
+          $npcapPath = "C:\Program Files\Npcap"
+          if (Test-Path $npcapPath) {
+            $env:PATH += ";$npcapPath"
+            Write-Host "Added $npcapPath to PATH"
+          } else {
+            Write-Warning "Npcap installation path not found: $npcapPath"
+          }
+
           $sdkUrl = "https://npcap.com/dist/npcap-sdk-1.15.zip"
           $sdkZip = "$env:USERPROFILE\npcap-sdk.zip"
           $destDir = "$env:USERPROFILE\npcap-sdk"
           $wpdpackDir = "C:\wpdpack"
           Invoke-WebRequest -Uri $sdkUrl -OutFile $sdkZip
           Expand-Archive -Path $sdkZip -DestinationPath $destDir -Force
-          if (Test-Path $wpdpackDir) { Remove-Item -Path $wpdpackDir -Recurse -Force }
+          Write-Host "Npcap SDK extracted to: $destDir"
+          Get-ChildItem -Path $destDir
+          if (Test-Path $wpdpackDir) {
+            Remove-Item -Path $wpdpackDir -Recurse -Force
+          }
           Copy-Item -Path $destDir -Destination $wpdpackDir -Recurse
+          Write-Host "Npcap SDK copied to: $wpdpackDir"
 
       - name: Set CGO flags for Npcap (Windows)
-        if: matrix.os == 'windows-latest'
+        if: "matrix.os == 'windows-latest'"
         run: |
           echo "CGO_CFLAGS=-IC:\wpdpack\Include" >> $env:GITHUB_ENV
           echo "CGO_LDFLAGS=-LC:\wpdpack\Lib" >> $env:GITHUB_ENV
