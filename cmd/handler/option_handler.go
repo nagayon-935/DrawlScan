@@ -4,10 +4,6 @@ import (
 	"fmt"
 	"reflect"
 
-	"os"
-
-	"github.com/spf13/cobra"
-	"github.com/spf13/pflag"
 	flag "github.com/spf13/pflag"
 )
 
@@ -37,17 +33,12 @@ type visualizationOption struct {
 	NoAscii bool
 }
 
-type completionOption struct {
-	GenerateCompletions bool
-}
-
 type options struct {
 	Analysis      *analysisOption
 	Capture       *captureOption
 	General       *generalOption
 	Io            *ioOption
 	Visualization *visualizationOption
-	Completion    *completionOption
 }
 
 func HelpMessage() string {
@@ -83,7 +74,6 @@ func buildFlagSet() (*flag.FlagSet, *options) {
 		Visualization: &visualizationOption{},
 		General:       &generalOption{},
 		Io:            &ioOption{},
-		Completion:    &completionOption{},
 	}
 
 	flags := flag.NewFlagSet("drawlscan", flag.ContinueOnError)
@@ -103,17 +93,12 @@ func buildFlagSet() (*flag.FlagSet, *options) {
 	flags.StringVarP(&opts.Io.ReadFile, "read", "r", "", "Read packets from a PCAP file instead of capturing live traffic")
 
 	flags.BoolVar(&opts.Visualization.NoAscii, "no-ascii", false, "Disable ASCII-art output")
-	flags.BoolVarP(&opts.Completion.GenerateCompletions, "generate-completions", "", false, "generate completions")
-	flags.MarkHidden("generate-completions")
 	return flags, opts
 }
 
 func Options(optArgs []string) map[string]interface{} {
 	flags, options := buildFlagSet()
 	flags.Parse(optArgs[1:])
-	if options.Completion.GenerateCompletions {
-		GenerateCompletion(flags)
-	}
 	optionMap := make(map[string]interface{})
 	collectFieldMap(reflect.ValueOf(options), optionMap)
 	return optionMap
@@ -135,21 +120,4 @@ func collectFieldMap(value reflect.Value, optionMap map[string]interface{}) {
 			optionMap[key] = fieldValue.Interface()
 		}
 	}
-}
-
-func GenerateCompletion(flag *pflag.FlagSet) error {
-	command := &cobra.Command{
-		Use: "drawlscan",
-	}
-	command.Flags().AddFlagSet(flag)
-	os.Mkdir("completions/", 0755)
-	os.Mkdir("completions/bash", 0755)
-	os.Mkdir("completions/zsh", 0755)
-	os.Mkdir("completions/fish", 0755)
-	os.Mkdir("completions/powershell", 0755)
-	command.GenBashCompletionFileV2("completions/bash/drawlscan", true)
-	command.GenZshCompletionFile("completions/zsh/drawlscan")
-	command.GenFishCompletionFile("completions/fish/drawlscan", true)
-	command.GenPowerShellCompletionFile("completions/powershell/drawlscan")
-	return nil
 }
