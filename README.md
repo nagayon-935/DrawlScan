@@ -19,7 +19,6 @@ Key Features:
     •   🎨 Visualize packet structures (Ethernet/IP/TCP/UDP/etc.) as ASCII diagrams  
     •   🌍 GeoIP-based source/destination display  
     •   🧭 Lightweight, TUI-style interface — no GUI required  
-    •   🐧 Perfect for learning, demos, or simply keeping an eye on your machine  
 
 ## Usage
 
@@ -49,32 +48,46 @@ OPTION
 
 ## Installation
 
+> [!WARNING]
+>Recommend installing via Homebrew.
+>When building from source, note that the software depends on C language libraries. Depending on your OS, additional system modules may be > > required.
+
 ### Homebrew
 
 ```bash
-🚧 under construction 🚧
+brew install nagayon-935/tap/drawlscan
+sudo ln -s "$(which drawlscan)" /usr/local/bin/drawlscan
+sudo drawlscan 
 ```
 
 ### Compile yourself
 
 ```bash
-🚧 under construction 🚧
+git clone https://github.com/nagayon-935/DrawlScan.git
+cd DrawkScan
+go mod tidy
+go build -o drawlscan cmd/main/drawlscan.go cmd/main/version.go
+sudo ./drawlscan
+```
+
+> [!WARNING]
+> On Linux, you may need to install the gcc compiler and libpcap-dev.
+> Also, you may need to set CGO_ENABLED=1 during the build process.
+
+
+### Docker
+
+```bash
+docker pull ghcr.io/nagayon-935/drawlscan:latest
+docker run -it --rm  drawlscan 
 ```
 
 ## About
 
-### Author
-
-* [nagayon-935](https://github.com/nagayon-935)
-
-### icon
+### Icon
 
 ![DrawlScan Icon](./docs/logo.png "DrawlScan Icon")
 
 ### The project name(**DrawlScan**) comes from?
 
 DrawlScan is a coined word that combines Draw (to represent packet visualization), Owl (a symbol of wisdom and observation), and Scan (for network traffic analysis)
-
-### GeoLite2 Data Notice
-
-This product includes GeoLite2 data created by MaxMind, available from [http://www.maxmind.com](http://www.maxmind.com)
