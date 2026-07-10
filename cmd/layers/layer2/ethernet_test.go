@@ -31,7 +31,10 @@ func TestPrintEthernetLayer(t *testing.T) {
 		"Type: IPv4",
 	}, color.New(color.FgCyan))
 
-	got := PrintEthernetLayer(packet)
+	got, ok := PrintEthernetLayer(packet)
+	if !ok {
+		t.Error("PrintEthernetLayer() ok = false, want true")
+	}
 	if got != want {
 		t.Errorf("PrintEthernetLayer() = %v, want %v", got, want)
 	}

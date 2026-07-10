@@ -10,7 +10,7 @@ import (
 	"github.com/nagayon-935/DrawlScan/cmd/utils"
 )
 
-func PrintDnsLayer(packet gopacket.Packet) string {
+func PrintDnsLayer(packet gopacket.Packet) (string, bool) {
 	dns := packet.Layer(layers.LayerTypeDNS).(*layers.DNS)
 	var answerRecord []string
 
@@ -21,9 +21,9 @@ func PrintDnsLayer(packet gopacket.Packet) string {
 			}
 		}
 		if len(answerRecord) > 0 {
-			return utils.RenderBlock("DNS Packet", answerRecord, color.New(color.FgHiGreen))
+			return utils.RenderBlock("DNS Packet", answerRecord, color.New(color.FgHiGreen)), true
 		}
 	}
 
-	return "invisible"
+	return "", false
 }

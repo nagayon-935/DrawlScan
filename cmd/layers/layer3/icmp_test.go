@@ -26,7 +26,10 @@ func TestPrintICMPLayer(t *testing.T) {
 		"Type: EchoRequest",
 	}, color.New(color.FgYellow))
 
-	got := PrintIcmpLayer(packet)
+	got, ok := PrintIcmpLayer(packet)
+	if !ok {
+		t.Error("PrintIcmpLayer() ok = false, want true")
+	}
 	if got != want {
 		t.Errorf("PrintICMPLayer() = %v, want %v", got, want)
 	}

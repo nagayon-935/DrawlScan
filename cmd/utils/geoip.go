@@ -30,8 +30,9 @@ func CloseGeoIP() {
 	}
 }
 
-// IPアドレスから国情報を取得
-func LookupCountry(ipStr string) string {
+// LookupCountry returns a rendered GeoIP block for the given IP address and
+// whether GeoIP data was found for it.
+func LookupCountry(ipStr string) (string, bool) {
 	ip := net.ParseIP(ipStr)
 
 	CountryRecord, _ := geoipCityDB.Country(ip)
@@ -41,7 +42,7 @@ func LookupCountry(ipStr string) string {
 	org := AsRecord.AutonomousSystemOrganization
 
 	if country == "" && org == "" {
-		return "invisible"
+		return "", false
 	}
 
 	geoipInfo := []string{
@@ -50,5 +51,5 @@ func LookupCountry(ipStr string) string {
 		"Organization: " + org,
 	}
 
-	return RenderBlock("GeoIP", geoipInfo, color.New(color.FgHiRed))
+	return RenderBlock("GeoIP", geoipInfo, color.New(color.FgHiRed)), true
 }

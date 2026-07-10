@@ -44,7 +44,10 @@ func TestPrintARPLayer(t *testing.T) {
 		"Target IP: 192.168.1.1",
 	}, color.New(color.FgHiYellow))
 
-	got := PrintARPLayer(packet)
+	got, ok := PrintARPLayer(packet)
+	if !ok {
+		t.Error("PrintARPLayer() ok = false, want true")
+	}
 	if got != want {
 		t.Errorf("PrintARPLayer() = %v, want %v", got, want)
 	}

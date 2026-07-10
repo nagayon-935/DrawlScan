@@ -11,7 +11,7 @@ import (
 	"github.com/nagayon-935/DrawlScan/cmd/utils"
 )
 
-func PrintDhcpLayer(packet gopacket.Packet) string {
+func PrintDhcpLayer(packet gopacket.Packet) (string, bool) {
 	dhcp := packet.Layer(layers.LayerTypeDHCPv4).(*layers.DHCPv4)
 	var subnetMask, router, domainName, leaseTime, serverIdentifier string
 	var domainNameServers []string
@@ -59,5 +59,5 @@ func PrintDhcpLayer(packet gopacket.Packet) string {
 		dhcpInfo = append(dhcpInfo, "Domain Name Servers: "+strings.Join(domainNameServers, ", "))
 	}
 
-	return utils.RenderBlock(fmt.Sprintf("DHCP %s", dhcp.Operation.String()), dhcpInfo, color.New(color.FgHiCyan))
+	return utils.RenderBlock(fmt.Sprintf("DHCP %s", dhcp.Operation.String()), dhcpInfo, color.New(color.FgHiCyan)), true
 }

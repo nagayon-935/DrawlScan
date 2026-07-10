@@ -7,9 +7,9 @@ import (
 	"github.com/nagayon-935/DrawlScan/cmd/utils"
 )
 
-func PrintIcmpLayer(packet gopacket.Packet) string {
+func PrintIcmpLayer(packet gopacket.Packet) (string, bool) {
 	icmp := packet.Layer(layers.LayerTypeICMPv4).(*layers.ICMPv4)
 	return utils.RenderBlock("ICMP Packet", []string{
 		"Type: " + icmp.TypeCode.String(),
-	}, color.New(color.FgHiMagenta))
+	}, color.New(color.FgHiMagenta)), true
 }

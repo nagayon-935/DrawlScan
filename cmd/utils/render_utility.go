@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/fatih/color"
 )
@@ -11,10 +12,10 @@ import (
 func RenderBlock(title string, lines []string, c *color.Color) string {
 	var b strings.Builder
 
-	maxWidth := len(title)
+	maxWidth := utf8.RuneCountInString(title)
 	for _, line := range lines {
-		if len(line) > maxWidth {
-			maxWidth = len(line)
+		if w := utf8.RuneCountInString(line); w > maxWidth {
+			maxWidth = w
 		}
 	}
 	maxWidth += 2
@@ -49,7 +50,7 @@ func PrintHorizontalBlocks(blocks []string) {
 			maxLines = len(blockLines)
 		}
 		for _, line := range blockLines {
-			visibleLength := len(stripANSI(line))
+			visibleLength := utf8.RuneCountInString(stripANSI(line))
 			if visibleLength > maxWidths[i] {
 				maxWidths[i] = visibleLength
 			}
@@ -60,7 +61,7 @@ func PrintHorizontalBlocks(blocks []string) {
 		for i := 0; i < len(lines); i++ {
 			if l < len(lines[i]) {
 				fmt.Print(lines[i][l])
-				fmt.Print(strings.Repeat(" ", maxWidths[i]-len(stripANSI(lines[i][l]))))
+				fmt.Print(strings.Repeat(" ", maxWidths[i]-utf8.RuneCountInString(stripANSI(lines[i][l]))))
 			} else {
 				fmt.Print(strings.Repeat(" ", maxWidths[i]))
 			}
