@@ -11,17 +11,18 @@ import (
 	"github.com/nagayon-935/DrawlScan/cmd/utils"
 )
 
-func PrintAppLayer(packet gopacket.Packet) string {
+func PrintAppLayer(packet gopacket.Packet) (string, bool) {
 	protocol := DetectAppProtocol(packet)
 	switch protocol {
 	case "HTTP":
-		return printHttpInfo(packet)
+		block := printHttpInfo(packet)
+		return block, block != ""
 	case "HTTPS":
-		return utils.RenderBlock("HTTPS", []string{"Encrypted Payload"}, color.New(color.FgHiCyan))
+		return utils.RenderBlock("HTTPS", []string{"Encrypted Payload"}, color.New(color.FgHiCyan)), true
 	case "QUIC":
-		return utils.RenderBlock("QUIC", []string{"Encrypted Payload"}, color.New(color.FgHiBlack))
+		return utils.RenderBlock("QUIC", []string{"Encrypted Payload"}, color.New(color.FgHiBlack)), true
 	default:
-		return ""
+		return "", false
 	}
 }
 

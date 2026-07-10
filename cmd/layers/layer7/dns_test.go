@@ -56,9 +56,9 @@ func TestPrintDnsLayer(t *testing.T) {
 
 	packet := gopacket.NewPacket(buf.Bytes(), layers.LayerTypeEthernet, gopacket.Default)
 
-	got := PrintDnsLayer(packet)
-	if got == "" {
-		t.Error("PrintDnsLayer() returned empty string, expected DNS block output")
+	got, ok := PrintDnsLayer(packet)
+	if !ok || got == "" {
+		t.Error("PrintDnsLayer() returned no content, expected DNS block output")
 	} else {
 		t.Log("DNS block:\n" + got)
 	}
@@ -84,10 +84,10 @@ func TestPrintDnsLayer(t *testing.T) {
 	}
 
 	packet = gopacket.NewPacket(buf.Bytes(), layers.LayerTypeEthernet, gopacket.Default)
-	got = PrintDnsLayer(packet)
-	if got != "invisible" {
-		t.Errorf("PrintDnsLayer() (DNS Queryのみ) = %q, want empty string", got)
+	got, ok = PrintDnsLayer(packet)
+	if ok || got != "" {
+		t.Errorf("PrintDnsLayer() (DNS Queryのみ) = (%q, %v), want (\"\", false)", got, ok)
 	} else {
-		t.Log("DNS Queryのみ: 空文字列が返ることを確認")
+		t.Log("DNS Queryのみ: 非表示(false)が返ることを確認")
 	}
 }

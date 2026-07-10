@@ -10,14 +10,14 @@ import (
 	"github.com/nagayon-935/DrawlScan/cmd/utils"
 )
 
-func PrintTcpLayer(packet gopacket.Packet) string {
+func PrintTcpLayer(packet gopacket.Packet) (string, bool) {
 	tcp := packet.Layer(layers.LayerTypeTCP).(*layers.TCP)
 
 	return utils.RenderBlock("TCP Packet", []string{
 		fmt.Sprintf("Src Port: %d", tcp.SrcPort),
 		fmt.Sprintf("Dst Port: %d", tcp.DstPort),
 		fmt.Sprintf("Flags: %s", tcpFlagsString(tcp)),
-	}, color.New(color.FgMagenta))
+	}, color.New(color.FgMagenta)), true
 }
 
 func tcpFlagsString(tcp *layers.TCP) string {

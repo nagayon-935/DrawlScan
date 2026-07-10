@@ -9,7 +9,7 @@ import (
 	"github.com/nagayon-935/DrawlScan/cmd/layers/layer7"
 )
 
-type LayerHandler func(gopacket.Packet) string
+type LayerHandler func(gopacket.Packet) (string, bool)
 
 var Handlers = []struct {
 	LayerType gopacket.LayerType

@@ -52,7 +52,10 @@ func TestPrintDhcpLayer_Request(t *testing.T) {
 		"Server Identifier: 192.168.1.254",
 	}, color.New(color.FgHiCyan))
 
-	got := PrintDhcpLayer(packet)
+	got, ok := PrintDhcpLayer(packet)
+	if !ok {
+		t.Error("PrintDhcpLayer() ok = false, want true")
+	}
 	if got != want {
 		t.Errorf("PrintDhcpLayer() = %v, want %v", got, want)
 	}
@@ -106,7 +109,10 @@ func TestPrintDhcpLayer_Reply(t *testing.T) {
 		"Domain Name Servers: 8.8.8.8",
 	}, color.New(color.FgHiCyan))
 
-	got := PrintDhcpLayer(packet)
+	got, ok := PrintDhcpLayer(packet)
+	if !ok {
+		t.Error("PrintDhcpLayer() ok = false, want true")
+	}
 	if got != want {
 		t.Errorf("PrintDhcpLayer() = %v, want %v", got, want)
 	}

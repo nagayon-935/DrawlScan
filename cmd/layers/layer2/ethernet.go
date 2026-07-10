@@ -7,11 +7,11 @@ import (
 	"github.com/nagayon-935/DrawlScan/cmd/utils"
 )
 
-func PrintEthernetLayer(packet gopacket.Packet) string {
+func PrintEthernetLayer(packet gopacket.Packet) (string, bool) {
 	eth := packet.Layer(layers.LayerTypeEthernet).(*layers.Ethernet)
 	return utils.RenderBlock("Ethernet Frame", []string{
 		"Src MAC: " + eth.SrcMAC.String(),
 		"Dst MAC: " + eth.DstMAC.String(),
 		"Type: " + eth.EthernetType.String(),
-	}, color.New(color.FgCyan))
+	}, color.New(color.FgCyan)), true
 }

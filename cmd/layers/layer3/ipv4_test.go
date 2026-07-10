@@ -29,7 +29,10 @@ func TestPrintIPv4Layer(t *testing.T) {
 		"Protocol: TCP",
 	}, color.New(color.FgGreen))
 
-	got := PrintIPv4Layer(packet)
+	got, ok := PrintIPv4Layer(packet)
+	if !ok {
+		t.Error("PrintIPv4Layer() ok = false, want true")
+	}
 	if got != want {
 		t.Errorf("PrintIPv4Layer() = %v, want %v", got, want)
 	}

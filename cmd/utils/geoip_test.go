@@ -27,7 +27,10 @@ func TestLookupCountry(t *testing.T) {
 	}, color.New(color.FgHiRed))
 
 	ipStr := "133.220.131.100"
-	got := LookupCountry(ipStr)
+	got, ok := LookupCountry(ipStr)
+	if !ok {
+		t.Fatal("LookupCountry() ok = false, want true")
+	}
 	if got != want {
 		t.Errorf("LookupCountry() = %v, want %v", got, want)
 	}

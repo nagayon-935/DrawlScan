@@ -150,14 +150,14 @@ func TestPrintAppLayerInfo(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := PrintAppLayer(tt.packet)
+			got, ok := PrintAppLayer(tt.packet)
 			if tt.wantSub == "" {
-				if got != "" {
-					t.Errorf("PrintAppLayer(%s) = %q, want empty string", tt.name, got)
+				if ok || got != "" {
+					t.Errorf("PrintAppLayer(%s) = (%q, %v), want (\"\", false)", tt.name, got, ok)
 				}
 			} else {
-				if !strings.Contains(got, tt.wantSub) {
-					t.Errorf("PrintAppLayer(%s) = %q, want substring %q", tt.name, got, tt.wantSub)
+				if !ok || !strings.Contains(got, tt.wantSub) {
+					t.Errorf("PrintAppLayer(%s) = (%q, %v), want substring %q", tt.name, got, ok, tt.wantSub)
 				}
 			}
 		})

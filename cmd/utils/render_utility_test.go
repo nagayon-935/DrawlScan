@@ -1,7 +1,10 @@
 package utils
 
 import (
+	"fmt"
+	"strings"
 	"testing"
+	"unicode/utf8"
 
 	"github.com/fatih/color"
 )
@@ -55,6 +58,28 @@ func TestRenderBlock(t *testing.T) {
 				t.Errorf("RenderBlock() = \n%v\nwant:\n%v", got, tt.want)
 			}
 		})
+	}
+}
+
+func TestRenderBlock_MultibyteWidth(t *testing.T) {
+	// "日本語" is 3 runes but 9 bytes in UTF-8; width must be based on
+	// visible rune count, not byte length, or the box is padded far wider
+	// than the widest visible line requires.
+	title := "日本語"
+	lines := []string{"ab"}
+
+	contentWidth := utf8.RuneCountInString(title) // widest line: 3 runes
+	maxWidth := contentWidth + 2
+
+	border := "+-" + strings.Repeat("-", maxWidth) + "-+\n"
+	want := border +
+		fmt.Sprintf("| %-*s |\n", maxWidth, title) +
+		fmt.Sprintf("| %-*s |\n", maxWidth, lines[0]) +
+		border
+
+	got := stripANSI(RenderBlock(title, lines, color.New(color.FgWhite)))
+	if got != want {
+		t.Errorf("RenderBlock() = \n%q\nwant:\n%q", got, want)
 	}
 }
 

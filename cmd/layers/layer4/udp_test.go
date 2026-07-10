@@ -47,7 +47,10 @@ func TestPrintUDPLayer(t *testing.T) {
 		"Dst Port: 53",
 	}, color.New(color.FgBlue))
 
-	got := PrintUdpLayer(packet)
+	got, ok := PrintUdpLayer(packet)
+	if !ok {
+		t.Error("PrintUdpLayer() ok = false, want true")
+	}
 	if got != want {
 		t.Errorf("PrintUDPLayer() = %v, want %v", got, want)
 	}

@@ -9,12 +9,12 @@ import (
 	"github.com/nagayon-935/DrawlScan/cmd/utils"
 )
 
-func PrintARPLayer(packet gopacket.Packet) string {
+func PrintARPLayer(packet gopacket.Packet) (string, bool) {
 	arp := packet.Layer(layers.LayerTypeARP).(*layers.ARP)
 	return utils.RenderBlock("ARP Packet", []string{
 		"Sender MAC: " + net.HardwareAddr(arp.SourceHwAddress).String(),
 		"Sender IP: " + net.IP(arp.SourceProtAddress).String(),
 		"Target MAC: " + net.HardwareAddr(arp.DstHwAddress).String(),
 		"Target IP: " + net.IP(arp.DstProtAddress).String(),
-	}, color.New(color.FgHiYellow))
+	}, color.New(color.FgHiYellow)), true
 }

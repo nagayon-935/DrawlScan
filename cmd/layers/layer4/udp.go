@@ -9,10 +9,10 @@ import (
 	"github.com/nagayon-935/DrawlScan/cmd/utils"
 )
 
-func PrintUdpLayer(packet gopacket.Packet) string {
+func PrintUdpLayer(packet gopacket.Packet) (string, bool) {
 	udp := packet.Layer(layers.LayerTypeUDP).(*layers.UDP)
 	return utils.RenderBlock("UDP Packet", []string{
 		fmt.Sprintf("Src Port: %d", udp.SrcPort),
 		fmt.Sprintf("Dst Port: %d", udp.DstPort),
-	}, color.New(color.FgBlue))
+	}, color.New(color.FgBlue)), true
 }

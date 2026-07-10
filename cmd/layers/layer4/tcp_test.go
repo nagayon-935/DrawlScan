@@ -51,7 +51,10 @@ func TestPrintTCPLayer(t *testing.T) {
 		"Flags: SYN ACK",
 	}, color.New(color.FgMagenta))
 
-	got := PrintTcpLayer(packet)
+	got, ok := PrintTcpLayer(packet)
+	if !ok {
+		t.Error("PrintTcpLayer() ok = false, want true")
+	}
 	if got != want {
 		t.Errorf("PrintTCPLayer() = %v, want %v", got, want)
 	}
