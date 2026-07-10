@@ -6,7 +6,6 @@ Observe your network traffic in real-time, rendered as ASCII art.
 ![MIT License](https://img.shields.io/badge/license-MIT-blue "MIT License")
 [![Go Report Card](https://goreportcard.com/badge/github.com/nagayon-935/DrawlScan)](https://goreportcard.com/report/github.com/nagayon-935/DrawlScan)
 [![Coverage Status](https://coveralls.io/repos/github/nagayon-935/DrawlScan/badge.svg?branch=main)](https://coveralls.io/github/nagayon-935/DrawlScan?branch=main)
-[![DOI](https://zenodo.org/badge/965584302.svg)](https://doi.org/10.5281/zenodo.15468387)
 
 ## Overview
 
