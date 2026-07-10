@@ -8,11 +8,21 @@ import (
 	"time"
 
 	"github.com/google/gopacket"
+	"github.com/google/gopacket/layers"
 	"github.com/google/gopacket/pcap"
 	"github.com/google/gopacket/pcapgo"
 	"github.com/nagayon-935/DrawlScan/cmd/handler"
 	"github.com/nagayon-935/DrawlScan/cmd/utils"
 )
+
+// liveHandle is the subset of *pcap.Handle used by runLiveCapture. It lets
+// tests inject a fake packet source instead of requiring OS capture
+// permissions.
+type liveHandle interface {
+	gopacket.PacketDataSource
+	LinkType() layers.LinkType
+	SetBPFFilter(expr string) error
+}
 
 func processAndPrintPacket(packet gopacket.Packet, geoip bool, isAscii bool) {
 	var blocks []string
@@ -118,6 +128,21 @@ func goMain(args []string) int {
 	}
 	defer handle.Close()
 
+	fmt.Println("Using interface: ", iface)
+
+	var timeout time.Duration
+	if timeSec > 0 {
+		timeout = time.Duration(timeSec) * time.Second
+	}
+
+	return runLiveCapture(handle, filter, writeFilePath, count, timeout, geoip, isAscii)
+}
+
+// runLiveCapture applies the BPF filter (if any), optionally mirrors captured
+// packets to writeFilePath, and processes packets from handle until the
+// packet channel closes, count packets have been received, or timeout
+// elapses (timeout <= 0 disables the timeout).
+func runLiveCapture(handle liveHandle, filter string, writeFilePath string, count int, timeout time.Duration, geoip bool, isAscii bool) int {
 	if filter != "" {
 		if err := handle.SetBPFFilter(filter); err != nil {
 			fmt.Println("Failed to set BPF filter: ", err)
@@ -151,12 +176,10 @@ func goMain(args []string) int {
 	packetChan := packetSource.Packets()
 
 	var timeCh <-chan time.Time
-	if timeSec > 0 {
-		timeCh = time.After(time.Duration(timeSec) * time.Second)
+	if timeout > 0 {
+		timeCh = time.After(timeout)
 	}
 	received := 0
-
-	fmt.Println("Using interface: ", iface)
 
 	done := false
 	start := time.Now()
