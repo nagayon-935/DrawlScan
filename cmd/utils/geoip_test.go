@@ -8,8 +8,25 @@ import (
 )
 
 func TestInitAndCloseGeoIP(t *testing.T) {
-	InitGeoIP()
+	if err := InitGeoIP(); err != nil {
+		t.Fatalf("InitGeoIP() error = %v, want nil", err)
+	}
 	CloseGeoIP()
+}
+
+func TestLookupCountry_NilDB(t *testing.T) {
+	// Arrange: simulate InitGeoIP not having been called (or having failed)
+	prevCity, prevAs := geoipCityDB, geoipAsDB
+	geoipCityDB, geoipAsDB = nil, nil
+	defer func() { geoipCityDB, geoipAsDB = prevCity, prevAs }()
+
+	// Act
+	got := LookupCountry("133.220.131.100")
+
+	// Assert
+	if got != "invisible" {
+		t.Errorf("LookupCountry() = %v, want %q when GeoIP DB is not initialized", got, "invisible")
+	}
 }
 
 func TestLookupCountry(t *testing.T) {
@@ -17,7 +34,9 @@ func TestLookupCountry(t *testing.T) {
 		t.Skip("Skipping test in CI environment")
 	}
 
-	InitGeoIP()
+	if err := InitGeoIP(); err != nil {
+		t.Fatalf("InitGeoIP() error = %v, want nil", err)
+	}
 	defer CloseGeoIP()
 
 	want := RenderBlock("GeoIP", []string{

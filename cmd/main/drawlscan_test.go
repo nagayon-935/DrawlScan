@@ -80,7 +80,9 @@ func Test_processAndPrintPacket(t *testing.T) {
 	processAndPrintPacket(packet, false, false)
 
 	// geoip, isAscii両方trueで呼び出し
-	utils.InitGeoIP()
+	if err := utils.InitGeoIP(); err != nil {
+		t.Fatalf("InitGeoIP() error = %v, want nil", err)
+	}
 	defer utils.CloseGeoIP()
 	processAndPrintPacket(packet, true, true)
 }
@@ -126,6 +128,19 @@ func Test_goMain_InvalidPcapFile(t *testing.T) {
 	args := []string{"drawlscan", "--read", "notfound.pcap"}
 	if got := goMain(args); got == 0 {
 		t.Errorf("goMain(invalid pcap) = %v, want != 0", got)
+	}
+}
+
+// Regression test for B-1: pcap.OpenOffline failing on a nonexistent file
+// combined with --filter used to dereference a nil handle before the
+// OpenOffline error was checked, causing a panic instead of a clean exit.
+func Test_goMain_InvalidPcapFile_WithFilter(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Skipping pcap test on Windows runner (wpcap.dll not always available)")
+	}
+	args := []string{"drawlscan", "--read", "notfound.pcap", "--filter", "tcp"}
+	if got := goMain(args); got == 0 {
+		t.Errorf("goMain(invalid pcap with filter) = %v, want != 0", got)
 	}
 }
 

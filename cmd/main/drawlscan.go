@@ -70,22 +70,26 @@ func goMain(args []string) int {
 	}
 
 	if geoip {
-		utils.InitGeoIP()
+		if err := utils.InitGeoIP(); err != nil {
+			fmt.Println("Failed to initialize GeoIP database:", err)
+			return 1
+		}
+		defer utils.CloseGeoIP()
 	}
 
 	if readFilePath != "" {
 		handle, err := pcap.OpenOffline(readFilePath)
+		if err != nil {
+			fmt.Println("Failed to open pcap file:", err)
+			return 1
+		}
+		defer handle.Close()
 		if filter != "" {
 			if err := handle.SetBPFFilter(filter); err != nil {
 				fmt.Println("Failed to set BPF filter: ", err)
 				return 1
 			}
 		}
-		if err != nil {
-			fmt.Println("Failed to open pcap file:", err)
-			return 1
-		}
-		defer handle.Close()
 		packetSource := gopacket.NewPacketSource(handle, handle.LinkType())
 		received := 0
 		for packet := range packetSource.Packets() {
@@ -162,6 +166,7 @@ func goMain(args []string) int {
 		case packet, ok := <-packetChan:
 			if !ok {
 				done = true
+				continue
 			}
 			if distFile != nil {
 				if err := pcapw.WritePacket(packet.Metadata().CaptureInfo, packet.Data()); err != nil {
@@ -179,7 +184,6 @@ func goMain(args []string) int {
 		}
 	}
 
-	utils.CloseGeoIP()
 	elapsed := time.Since(start)
 	fmt.Printf("Captured %d packets\n", received)
 	fmt.Printf("Capture duration: %.2f seconds\n", elapsed.Seconds())
