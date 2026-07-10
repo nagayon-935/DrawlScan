@@ -2,7 +2,6 @@ package utils
 
 import (
 	"embed"
-	"fmt"
 	"net"
 
 	"github.com/fatih/color"
@@ -51,5 +50,5 @@ func LookupCountry(ipStr string) string {
 		"Organization: " + org,
 	}
 
-	return RenderBlock(fmt.Sprintf("GeoIP"), geoipInfo, color.New(color.FgHiRed))
+	return RenderBlock("GeoIP", geoipInfo, color.New(color.FgHiRed))
 }

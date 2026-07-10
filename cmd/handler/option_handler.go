@@ -2,43 +2,42 @@ package handler
 
 import (
 	"fmt"
-	"reflect"
 
 	flag "github.com/spf13/pflag"
 )
 
-type analysisOption struct {
+type AnalysisOptions struct {
 	Geoip  bool
 	Filter string
 }
 
-type captureOption struct {
+type CaptureOptions struct {
 	Count int
 	Time  int
 }
 
-type generalOption struct {
+type GeneralOptions struct {
 	Help    bool
 	Version bool
 }
 
-type ioOption struct {
+type IOOptions struct {
 	InterfaceName string
 	OutputFile    string
 	ReadFile      string
 }
 
-type visualizationOption struct {
-	Ascii   bool
+type VisualizationOptions struct {
 	NoAscii bool
 }
 
-type options struct {
-	Analysis      *analysisOption
-	Capture       *captureOption
-	General       *generalOption
-	Io            *ioOption
-	Visualization *visualizationOption
+// Config holds the parsed command-line options grouped by concern.
+type Config struct {
+	Analysis      AnalysisOptions
+	Capture       CaptureOptions
+	General       GeneralOptions
+	IO            IOOptions
+	Visualization VisualizationOptions
 }
 
 func HelpMessage() string {
@@ -67,57 +66,33 @@ OPTIONS:
 `
 }
 
-func buildFlagSet() (*flag.FlagSet, *options) {
-	opts := &options{
-		Capture:       &captureOption{},
-		Analysis:      &analysisOption{},
-		Visualization: &visualizationOption{},
-		General:       &generalOption{},
-		Io:            &ioOption{},
-	}
+func buildFlagSet() (*flag.FlagSet, *Config) {
+	cfg := &Config{}
 
 	flags := flag.NewFlagSet("drawlscan", flag.ContinueOnError)
 	flags.Usage = func() { fmt.Println(HelpMessage()) }
 
-	flags.BoolVarP(&opts.Analysis.Geoip, "geoip", "g", false, "Show GeoIP information for source and destination IP addresses")
-	flags.StringVarP(&opts.Analysis.Filter, "filter", "f", "", "Filter packets")
+	flags.BoolVarP(&cfg.Analysis.Geoip, "geoip", "g", false, "Show GeoIP information for source and destination IP addresses")
+	flags.StringVarP(&cfg.Analysis.Filter, "filter", "f", "", "Filter packets")
 
-	flags.IntVarP(&opts.Capture.Count, "count", "c", -1, "Capture only a specified number of packets")
-	flags.IntVarP(&opts.Capture.Time, "time", "t", -1, "Stop capturing after a specified number of seconds")
+	flags.IntVarP(&cfg.Capture.Count, "count", "c", -1, "Capture only a specified number of packets")
+	flags.IntVarP(&cfg.Capture.Time, "time", "t", -1, "Stop capturing after a specified number of seconds")
 
-	flags.BoolVarP(&opts.General.Help, "help", "h", false, "Help message")
-	flags.BoolVarP(&opts.General.Version, "version", "v", false, "Version information")
+	flags.BoolVarP(&cfg.General.Help, "help", "h", false, "Help message")
+	flags.BoolVarP(&cfg.General.Version, "version", "v", false, "Version information")
 
-	flags.StringVarP(&opts.Io.InterfaceName, "interface", "i", "", "Specify the network interface to capture packets from (e.g., eth0, wlan0)")
-	flags.StringVarP(&opts.Io.OutputFile, "output", "o", "", " Save the captured packets to a file in PCAP format")
-	flags.StringVarP(&opts.Io.ReadFile, "read", "r", "", "Read packets from a PCAP file instead of capturing live traffic")
+	flags.StringVarP(&cfg.IO.InterfaceName, "interface", "i", "", "Specify the network interface to capture packets from (e.g., eth0, wlan0)")
+	flags.StringVarP(&cfg.IO.OutputFile, "output", "o", "", " Save the captured packets to a file in PCAP format")
+	flags.StringVarP(&cfg.IO.ReadFile, "read", "r", "", "Read packets from a PCAP file instead of capturing live traffic")
 
-	flags.BoolVar(&opts.Visualization.NoAscii, "no-ascii", false, "Disable ASCII-art output")
-	return flags, opts
+	flags.BoolVar(&cfg.Visualization.NoAscii, "no-ascii", false, "Disable ASCII-art output")
+	return flags, cfg
 }
 
-func Options(optArgs []string) map[string]interface{} {
-	flags, options := buildFlagSet()
+// Options parses the given argument list (including argv[0]) and returns the
+// resulting configuration.
+func Options(optArgs []string) *Config {
+	flags, cfg := buildFlagSet()
 	flags.Parse(optArgs[1:])
-	optionMap := make(map[string]interface{})
-	collectFieldMap(reflect.ValueOf(options), optionMap)
-	return optionMap
-}
-
-func collectFieldMap(value reflect.Value, optionMap map[string]interface{}) {
-	if value.Kind() == reflect.Ptr {
-		value = value.Elem()
-	}
-	valueType := value.Type()
-
-	fields := reflect.VisibleFields(valueType)
-	for _, field := range fields {
-		fieldValue := value.FieldByIndex(field.Index)
-		key := field.Name
-		if fieldValue.Kind() == reflect.Struct || (fieldValue.Kind() == reflect.Ptr && !fieldValue.IsNil() && fieldValue.Elem().Kind() == reflect.Struct) {
-			collectFieldMap(fieldValue, optionMap)
-		} else {
-			optionMap[key] = fieldValue.Interface()
-		}
-	}
+	return cfg
 }
