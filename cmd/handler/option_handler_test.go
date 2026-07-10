@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"reflect"
 	"testing"
 )
 
@@ -50,40 +49,19 @@ func Test_buildFlagSet(t *testing.T) {
 	}
 }
 
-func Test_collectFieldMap(t *testing.T) {
-	opts := &options{
-		Capture:       &captureOption{Count: 10, Time: 5},
-		Analysis:      &analysisOption{Geoip: true, Filter: "tcp"},
-		Visualization: &visualizationOption{Ascii: true, NoAscii: false},
-		General:       &generalOption{Help: true, Version: false},
-		Io:            &ioOption{InterfaceName: "eth0", OutputFile: "out.pcap"},
-	}
-	optionMap := make(map[string]interface{})
-	collectFieldMap(reflect.ValueOf(opts), optionMap)
-	if optionMap["Geoip"] != true {
-		t.Errorf("collectFieldMap() Geoip = %v, want true", optionMap["Geoip"])
-	}
-	if optionMap["Count"] != 10 {
-		t.Errorf("collectFieldMap() Count = %v, want 10", optionMap["Count"])
-	}
-	if optionMap["InterfaceName"] != "eth0" {
-		t.Errorf("collectFieldMap() InterfaceName = %v, want eth0", optionMap["InterfaceName"])
-	}
-}
-
 func TestOptions(t *testing.T) {
 	args := []string{"drawlscan", "--geoip", "--filter", "tcp", "--count", "5", "--interface", "eth0"}
 	got := Options(args)
-	if got["Geoip"] != true {
-		t.Errorf("Options() Geoip = %v, want true", got["Geoip"])
+	if !got.Analysis.Geoip {
+		t.Errorf("Options() Geoip = %v, want true", got.Analysis.Geoip)
 	}
-	if got["Filter"] != "tcp" {
-		t.Errorf("Options() Filter = %v, want tcp", got["Filter"])
+	if got.Analysis.Filter != "tcp" {
+		t.Errorf("Options() Filter = %v, want tcp", got.Analysis.Filter)
 	}
-	if got["Count"] != 5 {
-		t.Errorf("Options() Count = %v, want 5", got["Count"])
+	if got.Capture.Count != 5 {
+		t.Errorf("Options() Count = %v, want 5", got.Capture.Count)
 	}
-	if got["InterfaceName"] != "eth0" {
-		t.Errorf("Options() InterfaceName = %v, want eth0", got["InterfaceName"])
+	if got.IO.InterfaceName != "eth0" {
+		t.Errorf("Options() InterfaceName = %v, want eth0", got.IO.InterfaceName)
 	}
 }

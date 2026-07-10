@@ -45,18 +45,18 @@ func processAndPrintPacket(packet gopacket.Packet, geoip bool, isAscii bool) {
 }
 
 func goMain(args []string) int {
-	optionMap := handler.Options(args)
+	cfg := handler.Options(args)
 	var (
-		count         = optionMap["Count"].(int)
-		filter        = optionMap["Filter"].(string)
-		geoip         = optionMap["Geoip"].(bool)
-		help          = optionMap["Help"].(bool)
-		iface         = optionMap["InterfaceName"].(string)
-		writeFilePath = optionMap["OutputFile"].(string)
-		readFilePath  = optionMap["ReadFile"].(string)
-		timeSec       = optionMap["Time"].(int)
-		version       = optionMap["Version"].(bool)
-		isAscii       = !optionMap["NoAscii"].(bool)
+		count         = cfg.Capture.Count
+		filter        = cfg.Analysis.Filter
+		geoip         = cfg.Analysis.Geoip
+		help          = cfg.General.Help
+		iface         = cfg.IO.InterfaceName
+		writeFilePath = cfg.IO.OutputFile
+		readFilePath  = cfg.IO.ReadFile
+		timeSec       = cfg.Capture.Time
+		version       = cfg.General.Version
+		isAscii       = !cfg.Visualization.NoAscii
 	)
 
 	if help {

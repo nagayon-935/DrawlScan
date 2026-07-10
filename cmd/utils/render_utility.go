@@ -31,6 +31,8 @@ func RenderBlock(title string, lines []string, c *color.Color) string {
 	return b.String()
 }
 
+var ansiEscape = regexp.MustCompile(`\x1b\[[0-9;]*m`)
+
 func PrintHorizontalBlocks(blocks []string) {
 	if len(blocks) == 0 {
 		return
@@ -70,6 +72,5 @@ func PrintHorizontalBlocks(blocks []string) {
 }
 
 func stripANSI(input string) string {
-	var ansiEscape = regexp.MustCompile(`\x1b\[[0-9;]*m`)
 	return ansiEscape.ReplaceAllString(input, "")
 }

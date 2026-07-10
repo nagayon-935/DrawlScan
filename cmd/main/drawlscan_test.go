@@ -9,8 +9,25 @@ import (
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
+	"github.com/google/gopacket/pcap"
 	"github.com/nagayon-935/DrawlScan/cmd/utils"
 )
+
+// canCaptureLive reports whether this environment can open a live capture
+// handle (requires both a usable interface and OS-level capture permission,
+// e.g. root or CAP_NET_RAW on Linux, BPF device access on macOS).
+func canCaptureLive() bool {
+	iface := utils.AutoSelectInterface()
+	if iface == "" {
+		return false
+	}
+	handle, err := pcap.OpenLive(iface, 65535, true, pcap.BlockForever)
+	if err != nil {
+		return false
+	}
+	handle.Close()
+	return true
+}
 
 // stdOut is used for testable output redirection.
 var stdOut io.Writer = os.Stdout
@@ -69,8 +86,8 @@ func Test_processAndPrintPacket(t *testing.T) {
 }
 
 func Test_goMain_CountAndTimeOut(t *testing.T) {
-	if os.Getenv("CI") == "true" || os.Getenv("GITHUB_ACTIONS") == "true" {
-		t.Skip("Skipping this test in CI environment")
+	if !canCaptureLive() {
+		t.Skip("Skipping: no permission or interface available for live packet capture in this environment")
 	}
 	args := []string{"drawlscan", "--count", "10"}
 	if got := goMain(args); got != 0 {
